@@ -2,34 +2,33 @@ package edu.eci.dosw.tdd.core.util;
 
 public class ValidationUtil {
 
-	private ValidationUtil() {
-		throw new IllegalStateException("Utility class");
-	}
 
-	public static <T> T requireNonNull(T value, String fieldName) {
+	public static void requireNotNull(Object value, String fieldName) {
 		if (value == null) {
 			throw new IllegalArgumentException(fieldName + " no puede ser nulo");
 		}
-		return value;
 	}
 
-	public static String requireNonBlank(String value, String fieldName) {
-		requireNonNull(value, fieldName);
-		if (value.trim().isEmpty()) {
-			throw new IllegalArgumentException(fieldName + " no puede estar vacío");
+	public static void requireNotBlank(String value, String fieldName) {
+		requireNotNull(value, fieldName);
+		if (value.isBlank()) {
+			throw new IllegalArgumentException(fieldName + " no puede estar vacio");
 		}
-		return value.trim();
 	}
 
-	public static String requireLengthBetween(String value, String fieldName, int minLength, int maxLength) {
-		String sanitizedValue = requireNonBlank(value, fieldName);
-		int length = sanitizedValue.length();
-		if (length < minLength || length > maxLength) {
+	public static void requireLengthBetween(String value, int min, int max, String fieldName) {
+		requireNotBlank(value, fieldName);
+		int length = value.trim().length();
+		if (length < min || length > max) {
 			throw new IllegalArgumentException(
-				fieldName + " debe tener entre " + minLength + " y " + maxLength + " caracteres"
-			);
+					String.format("%s debe tener entre %d y %d caracteres", fieldName, min, max));
 		}
-		return sanitizedValue;
+	}
+
+	public static void requirePositive(int value, String fieldName) {
+		if (value <= 0) {
+			throw new IllegalArgumentException(fieldName + " debe ser mayor a cero");
+		}
 	}
 
 	public static void requireTrue(boolean condition, String message) {

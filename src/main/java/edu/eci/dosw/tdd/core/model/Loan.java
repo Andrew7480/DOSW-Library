@@ -6,10 +6,17 @@ import lombok.Data;
 
 @Data
 public class Loan {
-    private Book book;
-    private User user;
-    private LocalDate loanDate;
+    private final Book book;
+    private final User user;
+    private final LocalDate loanDate;
     private StatusLoanEnum status;
-    private LocalDate returnDate;
+    private final LocalDate returnDate;
 
+    public Loan(Book book, User user, LocalDate returnDate) {
+        this.book = book;
+        this.user = user;
+        this.loanDate = LocalDate.now();
+        this.status = StatusLoanEnum.ACTIVE;
+        this.returnDate = returnDate;
+    }
 }

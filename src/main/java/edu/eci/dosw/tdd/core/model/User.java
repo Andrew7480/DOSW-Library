@@ -4,11 +4,11 @@ import lombok.Data;
 
 @Data
 public class User {
-    private String name;
-    private String ID;
+    private final String name;
+    private final String id;
 
     public User(String id, String name){
-        ID = id;
+        this.id = id;
         this.name = name;
     }
 }
