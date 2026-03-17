@@ -4,7 +4,9 @@
 
 ![alt text](docs/image/diagramaComponentes.png)
 
+![alt text](docs/image/diagramasCompEspecifico.png)
 
+//falta especifico
 
 ## DIAGRAMA DE CLASES DE LA BIBLIOTECA
 
