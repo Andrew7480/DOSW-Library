@@ -2,6 +2,7 @@ package edu.eci.dosw.tdd.controller;
 
 import java.util.List;
 
+import edu.eci.dosw.tdd.controller.dto.MessageResponse;
 import edu.eci.dosw.tdd.controller.dto.UserDTO;
 import edu.eci.dosw.tdd.controller.mapper.UserMapper;
 import edu.eci.dosw.tdd.core.service.UserService;
@@ -10,6 +11,7 @@ import lombok.Data;
 
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -40,4 +42,14 @@ public class UserController {
 		return ResponseEntity.ok(UserMapper.toDTO(userService.getUserById(id)));
 	}
 
+	@GetMapping("/{name}")
+	public ResponseEntity<UserDTO> getUserByName(@PathVariable String name) {
+		return ResponseEntity.ok(UserMapper.toDTO(userService.getUserByName(name)));
+	}
+
+	@DeleteMapping("/{id}")
+	public ResponseEntity<MessageResponse> deleteUser(@PathVariable String id) {
+		userService.deleteUser(id);
+		return ResponseEntity.ok(new MessageResponse("Usuario borrado exitosamente"));
+	}
 }

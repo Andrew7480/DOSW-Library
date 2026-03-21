@@ -21,6 +21,8 @@ public class BookService {
     */
     private Map<Book, Integer> books = new HashMap<>();
 
+
+
     public Book addBook(String title, String author, int copies){
         BookValidator.validateCreateBook(title, author, copies);
         Book book = new Book(title, author, IdGeneratorUtil.generateId());
@@ -71,4 +73,5 @@ public class BookService {
     private Book findBookById(String id) {
         return books.keySet().stream().filter(b -> b.getId().equals(id)).findFirst().orElse(null);
     }
+    
 }

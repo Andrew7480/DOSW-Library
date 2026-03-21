@@ -7,6 +7,7 @@ import static org.mockito.Mockito.when;
 
 import java.time.LocalDate;
 
+import edu.eci.dosw.tdd.core.exception.InvalidInputException;
 import edu.eci.dosw.tdd.core.exception.LoanLimitExceededException;
 import edu.eci.dosw.tdd.core.model.Book;
 import edu.eci.dosw.tdd.core.model.Loan;
@@ -83,7 +84,7 @@ class LoanServiceTest {
 
     @Test
     void loanBookShouldThrowWhenReturnDateIsInvalid() {
-        assertThrows(IllegalArgumentException.class,
+        assertThrows(InvalidInputException.class,
                 () -> loanService.loanBook("u-1", "b-1", LocalDate.now().minusDays(1)));
     }
 }

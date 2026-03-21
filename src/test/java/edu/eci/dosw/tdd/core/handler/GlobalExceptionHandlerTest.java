@@ -7,6 +7,7 @@ import static org.mockito.Mockito.when;
 
 import java.util.List;
 
+import edu.eci.dosw.tdd.core.exception.InvalidInputException;
 import edu.eci.dosw.tdd.core.exception.LibraryException;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -56,9 +57,9 @@ class GlobalExceptionHandlerTest {
 
     @Test
     void handleIllegalArgumentShouldReturnBadRequest() {
-        IllegalArgumentException exception = new IllegalArgumentException("userId no puede estar vacio");
+        InvalidInputException exception = new InvalidInputException("userId no puede estar vacio");
 
-        ResponseEntity<ErrorResponse> response = handler.handleIllegalArgument(exception);
+        ResponseEntity<ErrorResponse> response = handler.handleBusinessErrors(exception);
 
         assertEquals(HttpStatus.BAD_REQUEST, response.getStatusCode());
         assertNotNull(response.getBody());

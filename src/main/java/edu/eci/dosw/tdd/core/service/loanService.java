@@ -43,4 +43,32 @@ public class LoanService {
     public List<Loan> getAllLoans() {
         return new ArrayList<>(loans);
     }
+
+    //------------------
+
+    public List<Loan> getLoansByUserId(String userId) {
+        userService.getUserById(userId);
+        return loans.stream()
+                .filter(loan -> loan.getUser().getId().equals(userId))
+                .toList();
+    }
+
+    public void returnBook(String userId, String bookId) {
+        LoanValidator.validateLoanRequest(userId, bookId, LocalDate.now());
+        Loan loan = loans.stream()
+                .filter(l -> l.getUser().getId().equals(userId))
+                .filter(l -> l.getBook().getId().equals(bookId))
+                .filter(l -> l.getStatus() == StatusLoanEnum.ACTIVE)
+                .findFirst()
+                .orElseThrow(() -> new IllegalArgumentException("No active loan found for user " + userId + " and book " + bookId));
+
+        loan.setStatus(StatusLoanEnum.RETURNED);
+    }
+
+    public boolean userHasActiveLoan(String userId) {
+        userService.getUserById(userId);
+        return loans.stream()
+                .filter(loan -> loan.getUser().getId().equals(userId))
+                .anyMatch(loan -> loan.getStatus() == StatusLoanEnum.ACTIVE);
+    }
 }
