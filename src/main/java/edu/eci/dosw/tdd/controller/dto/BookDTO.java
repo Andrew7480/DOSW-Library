@@ -15,6 +15,9 @@ public class BookDTO {
     @Positive
     private int copies;
 
+    public BookDTO() {
+    }
+
     public BookDTO(String title, String author, int copies) {
         this.title = title;
         this.author = author;

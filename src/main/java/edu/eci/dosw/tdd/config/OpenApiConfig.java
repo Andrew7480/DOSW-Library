@@ -9,7 +9,8 @@ import org.springframework.context.annotation.Configuration;
 
 @Configuration
 public class OpenApiConfig {
-
+    //http://localhost:8080/swagger-ui.html
+    
     @Bean
     public OpenAPI libraryOpenAPI() {
         return new OpenAPI()

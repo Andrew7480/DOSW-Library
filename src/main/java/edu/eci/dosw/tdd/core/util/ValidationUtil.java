@@ -4,6 +4,8 @@ import edu.eci.dosw.tdd.core.exception.InvalidInputException;
 
 public class ValidationUtil {
 
+	private ValidationUtil() {
+	}
 
 	public static void requireNotNull(Object value, String fieldName) {
 		if (value == null) {

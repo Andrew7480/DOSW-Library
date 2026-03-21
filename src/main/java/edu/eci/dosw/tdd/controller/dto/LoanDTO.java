@@ -18,6 +18,9 @@ public class LoanDTO {
 	private LocalDate returnDate;
 	private String status;
 
+    public LoanDTO() {
+    }
+
     public LoanDTO(String bookTitle, String userName, LocalDate loanDate, LocalDate returnDate, String status) {
         this.bookTitle = bookTitle;
         this.userName = userName;
