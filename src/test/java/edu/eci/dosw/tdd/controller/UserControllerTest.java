@@ -86,4 +86,20 @@ class UserControllerTest {
 
         verify(userService).getUserById("missing");
     }
+
+    @Test
+    void getUserByNameShouldReturnUserWhenExists() {
+        String name = "Maria";
+        when(userService.getUserByName(name)).thenReturn(new User("u-3", name));
+
+        ResponseEntity<UserDTO> response = userController.getUserByName(name);
+
+        assertEquals(HttpStatus.OK, response.getStatusCode());
+        assertNotNull(response.getBody());
+        assertEquals("u-3", response.getBody().getId());
+        assertEquals(name, response.getBody().getName());
+
+        verify(userService).getUserByName(name);
+    }
+
 }

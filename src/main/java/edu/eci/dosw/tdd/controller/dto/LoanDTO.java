@@ -10,17 +10,17 @@ import lombok.Data;
 public class LoanDTO {
 
     @NotBlank
-	private String bookId;
+	private String bookTitle;
     @NotBlank
-	private String userId;
+	private String userName;
 	private LocalDate loanDate;
     @NotNull
 	private LocalDate returnDate;
 	private String status;
 
-    public LoanDTO(String bookId, String userId, LocalDate loanDate, LocalDate returnDate, String status) {
-        this.bookId = bookId;
-        this.userId = userId;
+    public LoanDTO(String bookTitle, String userName, LocalDate loanDate, LocalDate returnDate, String status) {
+        this.bookTitle = bookTitle;
+        this.userName = userName;
         this.loanDate = loanDate;
         this.returnDate = returnDate;
         this.status = status;

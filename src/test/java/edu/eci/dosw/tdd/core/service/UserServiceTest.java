@@ -3,20 +3,15 @@ package edu.eci.dosw.tdd.core.service;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertThrows;
-import static org.mockito.Mockito.doNothing;
-import static org.mockito.Mockito.doThrow;
-import static org.mockito.Mockito.verify;
+
+import org.junit.jupiter.api.BeforeEach;
 
 import edu.eci.dosw.tdd.core.exception.InvalidInputException;
-import edu.eci.dosw.tdd.core.exception.UserDeletionNotAllowedException;
 import edu.eci.dosw.tdd.core.exception.UserNameAlreadyExistsException;
 import edu.eci.dosw.tdd.core.exception.UserNotFoundException;
 import edu.eci.dosw.tdd.core.model.User;
-import edu.eci.dosw.tdd.core.validator.UserDeleteValidator;
-import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
-import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 
 @ExtendWith(MockitoExtension.class)
@@ -24,14 +19,11 @@ class UserServiceTest {
 
     private UserService userService;
     
-    @Mock
-    private UserDeleteValidator userDeleteValidator;
-
     @BeforeEach
     void setUp() {
-        userService = new UserService(userDeleteValidator);
+        userService = new UserService();
     }
-
+    
     @Test
     void registerUserShouldCreateUserWithGeneratedId() {
         String name = "Ana";
@@ -99,33 +91,4 @@ class UserServiceTest {
         assertThrows(UserNotFoundException.class, () -> userService.getUserByName("NonExistent"));
     }
 
-    @Test
-    void deleteUserShouldRemoveUserWhenNoActiveLoans() {
-        User created = userService.registerUser("Pedro");
-        doNothing().when(userDeleteValidator).validateUserCanBeDeleted(created.getId());
-        
-        userService.deleteUser(created.getId());
-        
-        assertThrows(UserNotFoundException.class, () -> userService.getUserById(created.getId()));
-        
-        verify(userDeleteValidator).validateUserCanBeDeleted(created.getId());
-    }
-
-    @Test
-    void deleteUserShouldThrowWhenUserHasActiveLoans() {
-        User created = userService.registerUser("Juan");
-        doThrow(new UserDeletionNotAllowedException(created.getId()))
-            .when(userDeleteValidator)
-            .validateUserCanBeDeleted(created.getId());
-        
-        assertThrows(UserDeletionNotAllowedException.class, () -> userService.deleteUser(created.getId()));
-        
-        verify(userDeleteValidator).validateUserCanBeDeleted(created.getId());
-    }
-
-    @Test
-    void deleteUserShouldThrowWhenUserDoesNotExist() {
-        String nonExistentId = "missing-id";  
-        assertThrows(UserNotFoundException.class, () -> userService.deleteUser(nonExistentId));
-    }
 }

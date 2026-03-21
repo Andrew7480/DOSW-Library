@@ -5,6 +5,9 @@ import edu.eci.dosw.tdd.core.model.Book;
 
 public class BookMapper {
 
+	private BookMapper() {
+	}
+	
 	public static BookDTO toDTO(Book book, int copies) {
 		return new BookDTO(
 				book.getId(),

@@ -9,7 +9,6 @@ import edu.eci.dosw.tdd.core.exception.UserNameAlreadyExistsException;
 import edu.eci.dosw.tdd.core.exception.UserNotFoundException;
 import edu.eci.dosw.tdd.core.model.User;
 import edu.eci.dosw.tdd.core.util.IdGeneratorUtil;
-import edu.eci.dosw.tdd.core.validator.UserDeleteValidator;
 import edu.eci.dosw.tdd.core.validator.UserValidator;
 import lombok.Data;
 
@@ -24,7 +23,6 @@ public class UserService {
     */
     private Map<String,User> users = new HashMap<>();
 
-    private final UserDeleteValidator userDeleteValidator;
 
     public User registerUser(String name){
         UserValidator.validateCreateUser(name);
@@ -51,14 +49,6 @@ public class UserService {
     public User getUserByName(String name){
         UserValidator.validateUserName(name);
         return users.values().stream().filter(u -> u.getName().equals(name)).findFirst().orElseThrow(() -> new UserNotFoundException(name));
-    }
-
-
-    //voy a trabajar queun usuario se pueda eliminar si no tiene loans activos
-    public void deleteUser(String id){
-        getUserById(id);
-        userDeleteValidator.validateUserCanBeDeleted(id);
-        users.remove(id);
     }
 
     private void validateUserNameNotDuplicate(String name) {

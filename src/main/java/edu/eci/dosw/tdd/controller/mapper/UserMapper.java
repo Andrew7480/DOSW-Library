@@ -5,6 +5,8 @@ import edu.eci.dosw.tdd.core.model.User;
 
 public class UserMapper {
 
+	private UserMapper() {
+	}
 
 	public static UserDTO toDTO(User user) {
 		return new UserDTO(user.getId(), user.getName());

@@ -8,10 +8,13 @@ import edu.eci.dosw.tdd.core.model.User;
 
 public class LoanMapper {
 
+	private LoanMapper() {
+	}
+	
 	public static LoanDTO toDTO(Loan loan) {
 		return new LoanDTO(
-				loan.getBook().getId(),
-				loan.getUser().getId(),
+				loan.getBook().getTitle(),
+				loan.getUser().getName(),
 				loan.getLoanDate(),
 				loan.getReturnDate(),
 				loan.getStatus().name());
