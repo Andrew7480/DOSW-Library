@@ -56,8 +56,8 @@ class MapperTest {
         LoanDTO dto = LoanMapper.toDTO(loan);
         Loan mappedBack = LoanMapper.toModel(dto, book, user);
 
-        assertEquals("b-1", dto.getBookId());
-        assertEquals("u-1", dto.getUserId());
+        assertEquals("DDD", dto.getBookTitle());
+        assertEquals("Ana", dto.getUserName());
         assertEquals(StatusLoanEnum.RETURNED.name(), dto.getStatus());
         assertEquals(loan.getReturnDate(), dto.getReturnDate());
 

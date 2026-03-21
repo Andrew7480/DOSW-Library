@@ -7,6 +7,9 @@ import edu.eci.dosw.tdd.core.util.ValidationUtil;
 
 public class LoanValidator {
 
+	private LoanValidator() {
+	}
+
 	public static void validateLoanRequest(String userId, String bookId, LocalDate returnDate) {
 		ValidationUtil.requireNotBlank(userId, "userId");
 		ValidationUtil.requireNotBlank(bookId, "bookId");

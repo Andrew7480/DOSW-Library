@@ -40,4 +40,9 @@ public class UserController {
 		return ResponseEntity.ok(UserMapper.toDTO(userService.getUserById(id)));
 	}
 
+	@GetMapping("/{name}")
+	public ResponseEntity<UserDTO> getUserByName(@PathVariable String name) {
+		return ResponseEntity.ok(UserMapper.toDTO(userService.getUserByName(name)));
+	}
+
 }
