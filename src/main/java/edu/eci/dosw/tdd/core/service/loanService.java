@@ -17,7 +17,7 @@ import org.springframework.stereotype.Service;
 
 @Service
 @Data
-public class LoanService {
+public class LoanService{
 
     private static final int MAX_ACTIVE_LOANS_PER_USER = 3;
 
