@@ -1,4 +1,4 @@
-package edu.eci.dosw.tdd.core.handler;
+package edu.eci.dosw.tdd.handler;
 
 import java.time.LocalDateTime;
 

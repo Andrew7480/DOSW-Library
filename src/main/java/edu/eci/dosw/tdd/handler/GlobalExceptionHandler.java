@@ -1,4 +1,4 @@
-package edu.eci.dosw.tdd.core.handler;
+package edu.eci.dosw.tdd.handler;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
