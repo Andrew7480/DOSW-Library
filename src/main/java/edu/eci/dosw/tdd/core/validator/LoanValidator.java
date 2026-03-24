@@ -18,4 +18,11 @@ public class LoanValidator {
 				"la fecha de devolucion debe ser hoy o futura");
 	}
 
+	public static void validateLoanDates(LocalDate loanDate, LocalDate returnDate) {
+		ValidationUtil.requireNotNull(loanDate, "fecha de prestamo");
+		ValidationUtil.requireNotNull(returnDate, "fecha de devolucion");
+		ValidationUtil.requireTrue(!returnDate.isBefore(loanDate),
+				"la fecha de devolucion no puede ser anterior a la fecha de prestamo");
+	}
+
 }

@@ -77,7 +77,11 @@ El sistema implementa validaciones exhaustivas, manejo de errores estructurado y
 - DTOs mapean modelos a JSON
 - Excepciones heredan de `LibraryException`
 
----
+### 4. Modelo de Entidad Relacion
+
+![Diagrama de Clases](docs/image/ModeloEntidadRelacion.png)
+
+--
 
 ## Swagger/OpenAPI
 

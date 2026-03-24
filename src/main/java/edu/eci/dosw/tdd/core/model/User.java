@@ -4,8 +4,9 @@ import lombok.Data;
 
 @Data
 public class User {
-    private final String name;
     private final String id;
+    private final String name;
+    
 
     public User(String id, String name){
         this.id = id;

@@ -30,6 +30,7 @@ public class LoanService {
         User user = userService.getUserByName(userName);
         Book book = bookService.getBook(booktitle);
         LoanValidator.validateLoanRequest(user.getId(), book.getId(), returnDate);
+        LoanValidator.validateLoanDates(LocalDate.now(), returnDate);
 
         canLoanBook(user, book);
 
