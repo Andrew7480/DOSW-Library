@@ -8,7 +8,7 @@ import java.time.LocalDateTime;
 
 import org.junit.jupiter.api.Test;
 
-import edu.eci.dosw.tdd.handler.ErrorResponse;
+import edu.eci.dosw.tdd.controller.handler.ErrorResponse;
 
 class ErrorResponseTest {
 
