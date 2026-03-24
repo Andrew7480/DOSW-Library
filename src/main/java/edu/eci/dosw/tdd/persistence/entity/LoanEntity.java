@@ -7,6 +7,8 @@ import lombok.NoArgsConstructor;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 
+import edu.eci.dosw.tdd.core.model.StatusLoanEnum;
+
 @Entity
 @Table(name = "loans")
 @Data
@@ -32,9 +34,9 @@ public class LoanEntity {
     @Column(nullable = false)
     private LocalDate returnDate;
     
-    @ManyToOne(fetch = FetchType.EAGER)
-    @JoinColumn(name = "status_id", nullable = false)
-    private LoanStatusEntity status;
+    @Column(nullable = false)
+    @Enumerated(EnumType.STRING)
+    private StatusLoanEnum status;
     
     @Column(nullable = true)
     private LocalDateTime returnedAt;

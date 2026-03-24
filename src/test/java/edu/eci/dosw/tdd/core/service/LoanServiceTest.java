@@ -15,6 +15,7 @@ import edu.eci.dosw.tdd.core.exception.LoanLimitExceededException;
 import edu.eci.dosw.tdd.core.exception.LoanNotFoundException;
 import edu.eci.dosw.tdd.core.model.Book;
 import edu.eci.dosw.tdd.core.model.Loan;
+import edu.eci.dosw.tdd.core.model.Role;
 import edu.eci.dosw.tdd.core.model.StatusLoanEnum;
 import edu.eci.dosw.tdd.core.model.User;
 import org.junit.jupiter.api.BeforeEach;
@@ -53,7 +54,7 @@ class LoanServiceTest {
         String bookTitle = "Clean Code";
         LocalDate returnDate = WEEK_LATER;
         Book book = new Book(bookTitle, "Robert C. Martin", "b-1");
-        User user = new User("u-1", userName);
+        User user = new User("u-1", userName, Role.USER);
         
         when(userService.getUserByName(userName)).thenReturn(user);
         when(bookService.getBook(bookTitle)).thenReturn(book);
