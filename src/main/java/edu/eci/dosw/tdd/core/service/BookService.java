@@ -11,6 +11,9 @@ import edu.eci.dosw.tdd.core.exception.InvalidInputException;
 import edu.eci.dosw.tdd.core.model.Book;
 import edu.eci.dosw.tdd.core.util.IdGeneratorUtil;
 import edu.eci.dosw.tdd.core.validator.BookValidator;
+import edu.eci.dosw.tdd.persistence.entity.BookEntity;
+import edu.eci.dosw.tdd.persistence.mapper.BookEntityMapper;
+import edu.eci.dosw.tdd.persistence.repository.BookRepository;
 import lombok.Data;
 
 import org.springframework.stereotype.Service;
@@ -23,86 +26,88 @@ public class BookService {
     Se pueden agregar libros, un usuario puede obtener todos los libros, obtener un libro por su codigo de identificacion, 
     y se puede actualizar si un libro esta disponible o no
     */
-    private Map<Book, Integer> books = new HashMap<>();
+    private final BookRepository bookRepository;
+
+    public BookService(BookRepository bookRepository) {
+        this.bookRepository = bookRepository;
+    }
 
 
     public Book addBook(String title, String author, int copies){
         BookValidator.validateCreateBook(title, author, copies);
         verifyBookNotDuplicate(title);
-
-        Book book = new Book(title, author, IdGeneratorUtil.generateId());
-        books.put(book, copies);
+        Book book = new Book(IdGeneratorUtil.generateId(), title, author, copies, copies);
+        bookRepository.save(BookEntityMapper.toEntity(book));
         return book;
     }
 
     public Map<Book, Integer> getAllBooksWithCopies(){
-        return new HashMap<>(books);
+        return bookRepository.findAll().stream().collect(HashMap::new, (map, entity) -> map.put(BookEntityMapper.toModel(entity), entity.getAvailableStock()), HashMap::putAll);
     }
 
     public List<Book> getAllBooks(){
-        return books.keySet().stream().toList();
+        return bookRepository.findAll().stream().map(BookEntityMapper::toModel).toList();
     }
 
     public List<Book> getAllBooksByAuthor(String author) {
-        return books.keySet().stream().filter(b -> b.getAuthor().equals(author)).toList();
+        return bookRepository.findAllByAuthorIgnoreCase(author).stream().map(BookEntityMapper::toModel).toList();
     }
 
     public List<Book> getAvailableBooks(){
-        return books.entrySet().stream().filter(e -> e.getValue() > 0).map(Map.Entry::getKey).toList();
+        return bookRepository.findAllByAvailableStockGreaterThan(0).stream().map(BookEntityMapper::toModel).toList();
     }
     
-    public boolean isBookAvailable(String title){
-        getBook(title);
-        return books.keySet().stream().filter(b -> b.getTitle().equals(title)).findFirst().map(b -> books.get(b) > 0).orElseThrow(() -> new BookNotFoundException(title));
+    public boolean isBookAvailable(String title) {
+        var entity = findBookEntityByTitleOrThrow(title);
+        return entity.getAvailableStock() > 0;
     }
 
     public int getAvailableCopies(String title) {
-        isBookAvailable(title);
-        Book book = getBook(title);
-        return books.get(book);
+        return findBookEntityByTitleOrThrow(title).getAvailableStock();
     }
     
     public Book getBook(String title) {
-        return books.keySet().stream()
-                .filter(b -> b.getTitle().equals(title))
-                .findFirst()
-                .orElseThrow(() -> new BookNotFoundException(title));
+        return BookEntityMapper.toModel(findBookEntityByTitleOrThrow(title));
     }
 
     public boolean bookExists(String title) {
-        return books.keySet().stream().anyMatch(b -> b.getTitle().equals(title));
+        return bookRepository.findByTitleIgnoreCase(title).isPresent();
     }
 
     public void increaseAvailableCopies(String title, int copies) {
-        Book book = getBook(title);
-        int availableCopies = books.get(book);
-        books.put(book, availableCopies + copies);
+        BookEntity entity = findBookEntityByTitleOrThrow(title);
+        entity.setAvailableStock(entity.getAvailableStock() + copies);
+        bookRepository.save(entity);
     }
 
     public void decreaseAvailableCopies(String title, int copies) {
-        isBookAvailable(title);
-        Book book = getBook(title);
-        int availableCopies = books.get(book);
+        BookEntity entity = findBookEntityByTitleOrThrow(title);
+        int availableCopies = entity.getAvailableStock();
         if (availableCopies < copies) {
             throw new BookNotAvailableException(title);
         }
-        books.put(book, availableCopies - copies);
-    }
-
-    
-    private void verifyBookNotDuplicate(String title) {
-        String normalizedTitle = title.trim().toLowerCase();
-        if (books.keySet().stream().anyMatch(b -> b.getTitle().trim().toLowerCase().equals(normalizedTitle))) {
-            throw new BookAlreadyExitsException(title);
-        }
+        entity.setAvailableStock(availableCopies - copies);
+        bookRepository.save(entity);
     }
 
     public void updateAvailability(String title, int copies) {
         if (copies < 0) {
             throw new InvalidInputException("Available copies cannot be negative");
         }
-        Book book = getBook(title);
-        books.put(book, copies);
+        BookEntity entity = findBookEntityByTitleOrThrow(title);
+        entity.setAvailableStock(copies);
+        bookRepository.save(entity);
     }
-    
+
+    private void verifyBookNotDuplicate(String title) {
+        String normalizedTitle = title.trim().toLowerCase();
+        if (bookRepository.findByTitleIgnoreCase(normalizedTitle).isPresent()) {
+            throw new BookAlreadyExitsException(title);
+        }
+    }
+
+    private BookEntity findBookEntityByTitleOrThrow(String title) {
+        return bookRepository.findByTitleIgnoreCase(title)
+            .orElseThrow(() -> new BookNotFoundException(title));
+    }
 }

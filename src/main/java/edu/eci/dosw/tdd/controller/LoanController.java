@@ -40,8 +40,8 @@ public class LoanController {
 	}
 
 	@GetMapping("/user/{userName}")
-	public ResponseEntity<List<LoanDTO>> getLoansByUserName(@PathVariable String userName) {
-		List<LoanDTO> response = loanService.getLoansByUserName(userName).stream().map(LoanMapper::toDTO).toList();
+	public ResponseEntity<List<LoanDTO>> getLoansByUsername(@PathVariable String userName) {
+		List<LoanDTO> response = loanService.getLoansByUsername(userName).stream().map(LoanMapper::toDTO).toList();
 		return ResponseEntity.ok(response);
 	}
 

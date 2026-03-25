@@ -6,22 +6,27 @@ import java.util.Optional;
 
 import org.springframework.data.jpa.repository.JpaRepository;
 
+
 import edu.eci.dosw.tdd.persistence.entity.LoanEntity;
+import edu.eci.dosw.tdd.core.model.StatusLoanEnum;
 
 public interface LoanRepository extends JpaRepository<LoanEntity, String> {
+	// Préstamos de un usuario segun status
+	List<LoanEntity> findByUserIdAndStatus(String userId, StatusLoanEnum status);
 
-    List<LoanEntity> findByUser_NameIgnoreCase(String userName);
+	// Préstamos de un libro específico
+	List<LoanEntity> findByBookId(String bookId);
 
-    List<LoanEntity> findByStatus_NameIgnoreCase(String statusName);
+	// Préstamos vencidos (fecha de retorno pasada y no devueltos)
+	List<LoanEntity> findByReturnDateBeforeAndStatus(LocalDate date, StatusLoanEnum status);
 
-    List<LoanEntity> findByUser_NameIgnoreCaseAndStatus_NameIgnoreCase(String userName, String statusName);
+	// Préstamos entre fechas
+	List<LoanEntity> findByLoanDateBetween(LocalDate start, LocalDate end);
 
-    List<LoanEntity> findByReturnDateBeforeAndStatus_NameIgnoreCase(LocalDate date, String statusName);
 
-    Optional<LoanEntity> findFirstByUser_NameIgnoreCaseAndBook_TitleIgnoreCaseAndStatus_NameIgnoreCase(
-            String userName,
-            String bookTitle,
-            String statusName);
 
-    long countByUser_IdAndStatus_NameIgnoreCase(String userId, String statusName);
+	List<LoanEntity> findByUser_Username(String username);
+
+	Optional<LoanEntity> findByUser_UsernameAndBook_Title(String username, String title);
+
 }

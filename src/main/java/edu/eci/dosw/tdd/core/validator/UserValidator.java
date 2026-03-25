@@ -11,9 +11,12 @@ public class UserValidator {
 		ValidationUtil.requireNotBlank(name, "name");
 	}
 
-	public static void validateCreateUser(String name) {
+	public static void validateCreateUser(String name, String username, String passwordHash) {
 		validateUserName(name);
 		ValidationUtil.requireLengthBetween(name, 1, 100, "nombre");
+		ValidationUtil.requireNotBlank(username, "username");
+		ValidationUtil.requireLengthBetween(username, 1, 100, "username");
+		ValidationUtil.requireNotBlank(passwordHash, "passwordHash");
 	}
 
 	public static void validateUserId(String userId) {

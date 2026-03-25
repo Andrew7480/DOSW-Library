@@ -1,15 +1,16 @@
 package edu.eci.dosw.tdd.core.service;
 
-import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 
 import edu.eci.dosw.tdd.core.exception.UserNameAlreadyExistsException;
 import edu.eci.dosw.tdd.core.exception.UserNotFoundException;
+import edu.eci.dosw.tdd.core.model.Role;
 import edu.eci.dosw.tdd.core.model.User;
 import edu.eci.dosw.tdd.core.util.IdGeneratorUtil;
+import edu.eci.dosw.tdd.core.util.PasswordHashUtil;
 import edu.eci.dosw.tdd.core.validator.UserValidator;
+import edu.eci.dosw.tdd.persistence.mapper.UserEntityMapper;
+import edu.eci.dosw.tdd.persistence.repository.UserRepository;
 import lombok.Data;
 
 import org.springframework.stereotype.Service;
@@ -21,39 +22,46 @@ public class UserService {
     Se pueden registrar usuarios, obtener todos los usuarios registrados, 
     y obtener un usuario dependiendo su identificacion
     */
-    private Map<String,User> users = new HashMap<>();
+    private final UserRepository userRepository;
 
+    public UserService(UserRepository userRepository) {
+        this.userRepository = userRepository;
+    }
 
-    public User registerUser(String name){
-        UserValidator.validateCreateUser(name);
-        validateUserNameNotDuplicate(name);
+    public User registerUser(String name, String username, String passwordHash){
+        UserValidator.validateCreateUser(name, username, passwordHash);
+        validateUserNameNotDuplicate(username);
 
         String id = IdGeneratorUtil.generateId();
-        User user = new User(id, name);
-        users.put(id, user);
+        User user = new User(id, name, username, PasswordHashUtil.hashPassword(passwordHash));
+        userRepository.save(UserEntityMapper.toEntity(user));
+        return user;
+    }
+
+    public User registerUser(String name, String username, String passwordHash, Role role){
+        UserValidator.validateCreateUser(name, username, passwordHash);
+        validateUserNameNotDuplicate(username);
+        String id = IdGeneratorUtil.generateId();
+        User user = new User(id, name, username, PasswordHashUtil.hashPassword(passwordHash), role);
+        userRepository.save(UserEntityMapper.toEntity(user));
         return user;
     }
 
     public List<User> getUsers(){
-        return new ArrayList<>(users.values());
+        return userRepository.findAll().stream().map(UserEntityMapper::toModel).toList();
     }
 
     public User getUserById(String id){
-        UserValidator.validateUserId(id);
-        if (users.get(id) == null) {
-            throw new UserNotFoundException(id);
-        }
-        return users.get(id); 
+        return userRepository.findById(id).map(UserEntityMapper::toModel).orElseThrow(() -> new UserNotFoundException(id));
     }
 
-    public User getUserByName(String name){
-        UserValidator.validateUserName(name);
-        return users.values().stream().filter(u -> u.getName().equals(name)).findFirst().orElseThrow(() -> new UserNotFoundException(name));
+    public User getUserByUsername(String username){
+        return userRepository.findByUsername(username).map(UserEntityMapper::toModel).orElseThrow(() -> new UserNotFoundException(username));
     }
 
-    private void validateUserNameNotDuplicate(String name) {
-        if (users.values().stream().anyMatch(u -> u.getName().equals(name))) {
-            throw new UserNameAlreadyExistsException(name);
+    private void validateUserNameNotDuplicate(String username) {
+        if (userRepository.findByUsername(username).isPresent()) {
+            throw new UserNameAlreadyExistsException(username);
         }
     }
 }

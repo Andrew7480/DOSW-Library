@@ -9,6 +9,7 @@ import edu.eci.dosw.tdd.controller.dto.LoanDTO;
 import edu.eci.dosw.tdd.controller.dto.UserDTO;
 import edu.eci.dosw.tdd.core.model.Book;
 import edu.eci.dosw.tdd.core.model.Loan;
+import edu.eci.dosw.tdd.core.model.Role;
 import edu.eci.dosw.tdd.core.model.StatusLoanEnum;
 import edu.eci.dosw.tdd.core.model.User;
 import org.junit.jupiter.api.Test;
@@ -17,15 +18,15 @@ class MapperTest {
 
     @Test
     void bookMapperShouldMapModelToDtoAndBack() {
-        Book book = new Book("Clean Code", "Robert C. Martin", "b-1");
+        Book book = new Book("b-1", "Clean Code", "Robert C. Martin", 3);
 
-        BookDTO dto = BookMapper.toDTO(book, 3);
+        BookDTO dto = BookMapper.toDTO(book);
         Book mappedBack = BookMapper.toModel(dto);
 
         assertEquals("b-1", dto.getId());
         assertEquals("Clean Code", dto.getTitle());
         assertEquals("Robert C. Martin", dto.getAuthor());
-        assertEquals(3, dto.getCopies());
+        assertEquals(3, dto.getStock());
 
         assertEquals("b-1", mappedBack.getId());
         assertEquals("Clean Code", mappedBack.getTitle());
@@ -34,7 +35,7 @@ class MapperTest {
 
     @Test
     void userMapperShouldMapModelToDtoAndBack() {
-        User user = new User("u-1", "Ana");
+        User user = new User("u-1", "Ana", "ana123", "hash");
 
         UserDTO dto = UserMapper.toDTO(user);
         User mappedBack = UserMapper.toModel(dto);
@@ -48,13 +49,13 @@ class MapperTest {
 
     @Test
     void loanMapperShouldMapModelToDtoAndBack() {
-        Book book = new Book("DDD", "Eric Evans", "b-1");
-        User user = new User("u-1", "Ana");
-        Loan loan = new Loan(book, user, LocalDate.now().plusDays(7));
+        Book book = new Book("b-1", "DDD", "Eric Evans", 1);
+        User user = new User("u-1", "Ana", "ana123", "hash", Role.USER);
+        Loan loan = new Loan("l-1", user, book, LocalDate.now().plusDays(7));
         loan.setStatus(StatusLoanEnum.RETURNED);
 
         LoanDTO dto = LoanMapper.toDTO(loan);
-        Loan mappedBack = LoanMapper.toModel(dto, book, user);
+        Loan mappedBack = LoanMapper.toModel(dto, user, book);
 
         assertEquals("DDD", dto.getBookTitle());
         assertEquals("Ana", dto.getUserName());

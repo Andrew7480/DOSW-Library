@@ -11,9 +11,8 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 @AllArgsConstructor
 public class BookEntity {
-    
+
     @Id
-    @GeneratedValue(strategy = GenerationType.UUID)
     private String id;
     
     @Column(nullable = false, unique = true, length = 200)
@@ -27,4 +26,5 @@ public class BookEntity {
     
     @Column(nullable = false)
     private int availableStock;
+
 }

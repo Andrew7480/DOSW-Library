@@ -4,6 +4,7 @@ import java.util.List;
 
 import edu.eci.dosw.tdd.controller.dto.UserDTO;
 import edu.eci.dosw.tdd.controller.mapper.UserMapper;
+import edu.eci.dosw.tdd.core.model.Role;
 import edu.eci.dosw.tdd.core.service.UserService;
 import jakarta.validation.Valid;
 import lombok.Data;
@@ -26,7 +27,7 @@ public class UserController {
 
 	@PostMapping("/register")
 	public ResponseEntity<UserDTO> registerUser(@Valid @RequestBody UserDTO request) {
-		return new ResponseEntity<>(UserMapper.toDTO(userService.registerUser(request.getName())), HttpStatus.CREATED);
+		return new ResponseEntity<>(UserMapper.toDTO(userService.registerUser(request.getName(), request.getUsername(), request.getPassword(), Role.valueOf(request.getRole()))), HttpStatus.CREATED);
 	}
 
 	@GetMapping("/all")
@@ -40,9 +41,9 @@ public class UserController {
 		return ResponseEntity.ok(UserMapper.toDTO(userService.getUserById(id)));
 	}
 
-	@GetMapping("/{name}")
-	public ResponseEntity<UserDTO> getUserByName(@PathVariable String name) {
-		return ResponseEntity.ok(UserMapper.toDTO(userService.getUserByName(name)));
+	@GetMapping("/{username}")
+	public ResponseEntity<UserDTO> getUserByUsername(@PathVariable String username) {
+		return ResponseEntity.ok(UserMapper.toDTO(userService.getUserByUsername(username)));
 	}
 
 }

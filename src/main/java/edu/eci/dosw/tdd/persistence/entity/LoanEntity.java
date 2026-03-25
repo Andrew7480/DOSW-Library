@@ -17,13 +17,12 @@ import edu.eci.dosw.tdd.core.model.StatusLoanEnum;
 public class LoanEntity {
     
     @Id
-    @GeneratedValue(strategy = GenerationType.UUID)
     private String id;
     
     @ManyToOne(fetch = FetchType.EAGER)
     @JoinColumn(name = "user_id", nullable = false)
     private UserEntity user;
-    
+
     @ManyToOne(fetch = FetchType.EAGER)
     @JoinColumn(name = "book_id", nullable = false)
     private BookEntity book;
