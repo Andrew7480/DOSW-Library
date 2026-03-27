@@ -8,6 +8,7 @@ import static org.mockito.Mockito.when;
 
 import java.util.List;
 
+import edu.eci.dosw.tdd.controller.dto.UserCreatedResponseDTO;
 import edu.eci.dosw.tdd.controller.dto.UserDTO;
 import edu.eci.dosw.tdd.controller.mapper.UserMapper;
 import edu.eci.dosw.tdd.core.exception.UserNotFoundException;
@@ -40,7 +41,7 @@ class UserControllerTest {
         User requestModel = new User("u-1", "Ana", "ana123", "hash", Role.USER);
         when(userService.registerUser("Ana", "ana123", "hash", Role.USER)).thenReturn(requestModel);
 
-        ResponseEntity<UserDTO> response = userController.registerUser(UserMapper.toDTO(requestModel));
+        ResponseEntity<UserCreatedResponseDTO> response = userController.registerUser(UserMapper.toDTO(requestModel));
 
         assertEquals(HttpStatus.CREATED, response.getStatusCode());
         assertNotNull(response.getBody());
