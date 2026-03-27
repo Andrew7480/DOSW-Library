@@ -13,4 +13,5 @@ public interface BookRepository extends MongoRepository<BookDocument, String> {
 
     @Query(value="{author: '?0'}", fields="{title: 1, author: 1}")
     List<BookDocument> findAllByAuthor(String author);
+    
 }

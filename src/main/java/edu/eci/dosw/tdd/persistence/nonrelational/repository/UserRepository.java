@@ -11,6 +11,4 @@ public interface UserRepository extends MongoRepository<UserDocument, String> {
     @Query("{username: '?0'}")
     UserDocument findUserByUsername(String username);
 
-    @Query(value="{role: '?0'}", fields="{name: 1, username: 1, role: 1}")
-    List<UserDocument> findAllByRole(String role);
 }
