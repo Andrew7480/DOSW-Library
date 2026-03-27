@@ -1,4 +1,4 @@
-package edu.eci.dosw.tdd.core.model;
+package edu.eci.dosw.tdd.persistence.nonrelational.document;
 
 public enum Membership {
 
