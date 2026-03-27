@@ -16,6 +16,49 @@ buildNumber.properties
 # JDT-specific (Eclipse Java Development Tools)
 .classpath
 
+# VSCode
+.vscode/
+
+# Postman
+*.postman_collection.json
+*.postman_environment.json
+postman/
+
+# Sistema operativo
+Thumbs.db
+.DS_Store
+ehthumbs.db
+Desktop.ini
+
+# Archivos de entorno
+.env
+.env.*
+
+# Archivos de logs
+*.log
+logs/
+
+# Archivos temporales
+*.tmp
+*.swp
+*.swo
+~*
+
+# Archivos de IDEs
+.idea/
+.project
+.classpath
+.settings/
+.metadata/
+.history/
+.gradle/
+.mvn/
+
+# Archivos de Maven y build
+target/
+build/
+out/
+
 HELP.md
 target/
 .mvn/wrapper/maven-wrapper.jar
