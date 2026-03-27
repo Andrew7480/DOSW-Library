@@ -3,8 +3,6 @@ package edu.eci.dosw.tdd.persistence.nonrelational.document;
 import org.springframework.data.annotation.Id;
 import org.springframework.data.mongodb.core.mapping.Document;
 
-import edu.eci.dosw.tdd.core.model.Availability;
-import edu.eci.dosw.tdd.core.model.Metadata;
 import lombok.Data;
 
 import java.util.List;

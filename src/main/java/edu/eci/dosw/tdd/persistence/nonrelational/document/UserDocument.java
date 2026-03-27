@@ -21,18 +21,7 @@ public class UserDocument {
     private Role role;
     private Membership membership;
     private String createdAt;
-    private List<LoanInfo> loans;
+    private List<Loans> loans;
+    
 
-    public static class LoanInfo {
-        private String id;
-        private String bookId;
-        private String loanDate;
-        private String returnDate;
-        private String returnedAt;
-        private List<StatusHistory> statusHistory;
-    }
-    public static class StatusHistory {
-        private String status;
-        private String date;
-    }
 }
