@@ -119,7 +119,7 @@ http://localhost:8080/swagger-ui.html
 
 ---
 
-## Video Demo
+## Video Demo 
 
 Video de demostración del proyecto:
 
@@ -127,4 +127,10 @@ Video de demostración del proyecto:
 
 
 ---
+
+## Video Demo con persistencia
+
+Video de demostración del proyecto:
+
+[Ver video](docs/image/funcionalidadesPersistencia.mp4)
 
