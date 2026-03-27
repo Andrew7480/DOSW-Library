@@ -26,6 +26,6 @@ server:
   ssl:
     enabled: true
     key-store: classpath:keystore.p12
-    key-store-password: password123
+    key-store-password: library
     key-store-type: PKCS12
     key-alias: dosw-library

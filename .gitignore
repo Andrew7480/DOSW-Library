@@ -49,3 +49,7 @@ build/
 
 ### VS Code ###
 .vscode/
+
+
+.postman/
+.postman
