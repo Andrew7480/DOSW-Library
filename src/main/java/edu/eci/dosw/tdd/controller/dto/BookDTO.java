@@ -13,22 +13,27 @@ public class BookDTO {
     @NotBlank
 	private String author;
     @Positive
-    private int copies;
+    private int stock;
+    @Positive
+    private int availableCopies;
 
     public BookDTO() {
     }
 
-    public BookDTO(String title, String author, int copies) {
-        this.title = title;
-        this.author = author;
-        this.copies = copies;
-    }
-
-    public BookDTO(String id, String title, String author, int copies) {
+    public BookDTO(String id, String title, String author, int stock) {
         this.id = id;
         this.title = title;
         this.author = author;
-        this.copies = copies;
+        this.stock = stock;
+        this.availableCopies = stock;
+    }
+
+    public BookDTO(String id, String title, String author, int stock, int availableCopies) {
+        this.id = id;
+        this.title = title;
+        this.author = author;
+        this.stock = stock;
+        this.availableCopies = availableCopies;
     }
 
 }

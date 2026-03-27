@@ -30,13 +30,13 @@ public class BookController {
 
 	@PostMapping("/add")
 	public ResponseEntity<BookDTO> addBook(@Valid @RequestBody BookDTO request) {
-		Book created = bookService.addBook(request.getTitle(), request.getAuthor(), request.getCopies());
-		return new ResponseEntity<>(BookMapper.toDTO(created, request.getCopies()), HttpStatus.CREATED);
+		Book created = bookService.addBook(request.getTitle(), request.getAuthor(), request.getStock());
+		return new ResponseEntity<>(BookMapper.toDTO(created), HttpStatus.CREATED);
 	}
 	@GetMapping("/allWithCopies")
 	public ResponseEntity<List<BookDTO>> getAllBooksWithCopies() {
 		List<BookDTO> response = bookService.getAllBooksWithCopies().entrySet().stream()
-				.map(e -> new BookDTO(e.getKey().getId(), e.getKey().getTitle(), e.getKey().getAuthor(), e.getValue()))
+				.map(e -> new BookDTO(e.getKey().getId(), e.getKey().getTitle(), e.getKey().getAuthor(), e.getKey().getTotalStock(), e.getValue()))
 			.toList();
 		return ResponseEntity.ok(response);
 	}
@@ -44,7 +44,7 @@ public class BookController {
 	@GetMapping("/all")
 	public ResponseEntity<List<BookDTO>> getAllBooks() {
 		List<BookDTO> response = bookService.getAllBooks().stream()
-				.map(book -> new BookDTO(book.getId(), book.getTitle(), book.getAuthor(), bookService.getAvailableCopies(book.getTitle())))
+				.map(book -> new BookDTO(book.getId(), book.getTitle(), book.getAuthor(), book.getTotalStock(), book.getAvailableStock()))
 			.toList();
 		return ResponseEntity.ok(response);
 	}
@@ -52,7 +52,7 @@ public class BookController {
 	@GetMapping("/author/{author}")
 	public ResponseEntity<List<BookDTO>> getBooksByAuthor(@PathVariable String author) {
 		List<BookDTO> response = bookService.getAllBooksByAuthor(author).stream()
-				.map(book -> new BookDTO(book.getId(), book.getTitle(), book.getAuthor(), bookService.getAvailableCopies(book.getTitle())))
+				.map(book -> new BookDTO(book.getId(), book.getTitle(), book.getAuthor(), book.getTotalStock(), book.getAvailableStock()))
 			.toList();
 		return ResponseEntity.ok(response);
 	}
@@ -60,7 +60,7 @@ public class BookController {
 	@GetMapping("/available")
 	public ResponseEntity<List<BookDTO>> getAvailableBooks() {
 		List<BookDTO> response = bookService.getAvailableBooks().stream()
-				.map(book -> new BookDTO(book.getId(), book.getTitle(), book.getAuthor(), bookService.getAvailableCopies(book.getTitle())))
+				.map(book -> new BookDTO(book.getId(), book.getTitle(), book.getAuthor(), book.getTotalStock(), book.getAvailableStock()))
 			.toList();
 		return ResponseEntity.ok(response);
 	}
@@ -76,7 +76,7 @@ public class BookController {
 
 	@GetMapping("/{title}")
 	public ResponseEntity<BookDTO> getBookByTitle(@PathVariable String title) {
-		return ResponseEntity.ok(BookMapper.toDTO(bookService.getBook(title), bookService.getAvailableCopies(title)));
+		return ResponseEntity.ok(BookMapper.toDTO(bookService.getBook(title)));
 	}
 
 	@GetMapping("/exists/{title}")
@@ -97,10 +97,9 @@ public class BookController {
 	}
 
 	@PatchMapping("/update/{title}")
-	public ResponseEntity<BookDTO> updateBook(@PathVariable String title, @Valid @RequestBody BookDTO request) {
-		bookService.decreaseAvailableCopies(title, bookService.getAvailableCopies(title));
-		Book updated = bookService.addBook(request.getTitle(), request.getAuthor(), request.getCopies());
-		return ResponseEntity.ok(BookMapper.toDTO(updated, request.getCopies()));
+	public ResponseEntity<Void> updateAvailabilityBook(@PathVariable String title, @RequestBody int copies) {
+		bookService.updateAvailability(title, copies);
+		return ResponseEntity.ok().build();
 	}
 
 }

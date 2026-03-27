@@ -8,15 +8,16 @@ public class BookMapper {
 	private BookMapper() {
 	}
 	
-	public static BookDTO toDTO(Book book, int copies) {
+	public static BookDTO toDTO(Book book) {
 		return new BookDTO(
 				book.getId(),
 				book.getTitle(),
 				book.getAuthor(),
-				copies);
+				book.getTotalStock(),
+				book.getAvailableStock());
 	}
 
 	public static Book toModel(BookDTO dto) {
-		return new Book(dto.getTitle(), dto.getAuthor(), dto.getId());
+		return new Book(dto.getId(), dto.getTitle(), dto.getAuthor(), dto.getStock(), dto.getAvailableCopies());
 	}
 }

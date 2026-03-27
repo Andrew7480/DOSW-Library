@@ -13,15 +13,16 @@ public class LoanMapper {
 	
 	public static LoanDTO toDTO(Loan loan) {
 		return new LoanDTO(
-				loan.getBook().getTitle(),
+				loan.getId(),
 				loan.getUser().getName(),
+				loan.getBook().getTitle(),
 				loan.getLoanDate(),
 				loan.getReturnDate(),
 				loan.getStatus().name());
 	}
 
-	public static Loan toModel(LoanDTO dto, Book book, User user) {
-		Loan loan = new Loan(book, user, dto.getReturnDate());
+	public static Loan toModel(LoanDTO dto, User user, Book book) {
+		Loan loan = new Loan(dto.getId(), user, book, dto.getReturnDate());
 		if (dto.getStatus() != null && !dto.getStatus().isBlank()) {
 			loan.setStatus(StatusLoanEnum.valueOf(dto.getStatus().toUpperCase()));
 		}
