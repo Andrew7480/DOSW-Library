@@ -37,27 +37,26 @@ class BookControllerTest {
 
     @Test
     void addBookShouldReturnCreatedBook() {
-        Book created = new Book("Clean Code", "Robert C. Martin", "b-1");
+        Book created = new Book( "b-1", "Clean Code", "Robert C. Martin", 3);
         when(bookService.addBook("Clean Code", "Robert C. Martin", 3)).thenReturn(created);
 
-        ResponseEntity<BookDTO> response = bookController.addBook(new BookDTO("Clean Code", "Robert C. Martin", 3));
+        ResponseEntity<BookDTO> response = bookController.addBook(new BookDTO("b-1", "Clean Code", "Robert C. Martin", 3));
 
         assertEquals(HttpStatus.CREATED, response.getStatusCode());
         assertNotNull(response.getBody());
         assertEquals("b-1", response.getBody().getId());
         assertEquals("Clean Code", response.getBody().getTitle());
-        assertEquals(3, response.getBody().getCopies());
+        assertEquals(3, response.getBody().getStock());
         
         verify(bookService).addBook("Clean Code", "Robert C. Martin", 3);
     }
 
     @Test
     void getAllBooksShouldReturnAllBooks() {
-        Book book1 = new Book("Book 1", "Author 1", "b-1");
-        Book book2 = new Book("Book 2", "Author 2", "b-2");
+        Book book1 = new Book("b-1", "Book 1", "Author 1", 3);
+        Book book2 = new Book("b-2", "Book 2", "Author 2", 2);
         when(bookService.getAllBooks()).thenReturn(List.of(book1, book2));
-        when(bookService.getAvailableCopies("Book 1")).thenReturn(2);
-        when(bookService.getAvailableCopies("Book 2")).thenReturn(1);
+
 
         ResponseEntity<List<BookDTO>> response = bookController.getAllBooks();
 
@@ -65,19 +64,18 @@ class BookControllerTest {
         assertNotNull(response.getBody());
         assertEquals(2, response.getBody().size());
         assertEquals("b-1", response.getBody().get(0).getId());
-        assertEquals(1, response.getBody().get(1).getCopies());
+        assertEquals(3, response.getBody().get(0).getStock());
+        assertEquals("b-2", response.getBody().get(1).getId());
+        assertEquals(2, response.getBody().get(1).getStock());
         
         verify(bookService).getAllBooks();
-        verify(bookService).getAvailableCopies("Book 1");
-        verify(bookService).getAvailableCopies("Book 2");
     }
 
     @Test
     void getBookByTitleShouldReturnBookWhenExists() {
         String title = "DDD";
-        Book book = new Book(title, "Eric Evans", "b-1");
+        Book book = new Book("b-1", title, "Eric Evans", 3);
         when(bookService.getBook(title)).thenReturn(book);
-        when(bookService.getAvailableCopies(title)).thenReturn(2);
 
         ResponseEntity<BookDTO> response = bookController.getBookByTitle(title);
 
@@ -85,10 +83,9 @@ class BookControllerTest {
         assertNotNull(response.getBody());
         assertEquals("b-1", response.getBody().getId());
         assertEquals(title, response.getBody().getTitle());
-        assertEquals(2, response.getBody().getCopies());
+        assertEquals(3, response.getBody().getStock());
         
         verify(bookService).getBook(title);
-        verify(bookService).getAvailableCopies(title);
     }
 
     @Test
@@ -132,11 +129,9 @@ class BookControllerTest {
     @Test
     void getBooksByAuthorShouldReturnBooksForThatAuthor() {
         String author = "Robert C. Martin";
-        Book book1 = new Book("Clean Code", author, "b-1");
-        Book book2 = new Book("Clean Architecture", author, "b-2");
+        Book book1 = new Book("b-1", "Clean Code", author, 3);
+        Book book2 = new Book("b-2", "Clean Architecture", author, 2);
         when(bookService.getAllBooksByAuthor(author)).thenReturn(List.of(book1, book2));
-        when(bookService.getAvailableCopies("Clean Code")).thenReturn(3);
-        when(bookService.getAvailableCopies("Clean Architecture")).thenReturn(2);
 
         ResponseEntity<List<BookDTO>> response = bookController.getBooksByAuthor(author);
 
@@ -149,9 +144,8 @@ class BookControllerTest {
 
     @Test
     void getAvailableBooksShouldReturnOnlyAvailableBooks() {
-        Book book1 = new Book("Available", "Author 1", "b-1");
+        Book book1 = new Book("b-1", "Available", "Author 1", 1);
         when(bookService.getAvailableBooks()).thenReturn(List.of(book1));
-        when(bookService.getAvailableCopies("Available")).thenReturn(1);
 
         ResponseEntity<List<BookDTO>> response = bookController.getAvailableBooks();
 
@@ -188,25 +182,14 @@ class BookControllerTest {
     }
 
     @Test
-    void updateBookShouldUpdateTitleAuthorAndCopies() {
-        String oldTitle = "Old Title";
-        Book updatedBook = new Book("New Title", "New Author", "b-1");
-        BookDTO requestDTO = new BookDTO("New Title", "New Author", 5);
-        when(bookService.getAvailableCopies(oldTitle)).thenReturn(2);
-        doNothing().when(bookService).decreaseAvailableCopies(oldTitle, 2);
-        when(bookService.addBook("New Title", "New Author", 5)).thenReturn(updatedBook);
+    void updateBookShouldUpdateAvailabilityBook() {
+        String title = "Old Title";
+        int newCopies = 5;
+        doNothing().when(bookService).updateAvailability(title, newCopies);
 
-        ResponseEntity<BookDTO> response = bookController.updateBook(oldTitle, requestDTO);
+        ResponseEntity<Void> response = bookController.updateAvailabilityBook(title, newCopies);
 
         assertEquals(HttpStatus.OK, response.getStatusCode());
-        assertNotNull(response.getBody());
-        assertEquals("b-1", response.getBody().getId());
-        assertEquals("New Title", response.getBody().getTitle());
-        assertEquals("New Author", response.getBody().getAuthor());
-        assertEquals(5, response.getBody().getCopies());
-
-        verify(bookService).getAvailableCopies(oldTitle);
-        verify(bookService).decreaseAvailableCopies(oldTitle, 2);
-        verify(bookService).addBook("New Title", "New Author", 5);
+        verify(bookService).updateAvailability(title, newCopies);
     }
 }

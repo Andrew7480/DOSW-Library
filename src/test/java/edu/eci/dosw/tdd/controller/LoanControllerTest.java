@@ -46,12 +46,12 @@ class LoanControllerTest {
 
     @Test
     void loanBookShouldReturnCreatedLoan() {
-        Loan loan = new Loan(new Book("Clean Code", "Robert C. Martin", "b-1"), new User("u-1", "Ana"),
+        Loan loan = new Loan("l-1", new User("u-1", "Ana", "ana123", "hash"), new Book("b-1","Clean Code", "Robert C. Martin", 21), 
                 SEVEN_DAYS_LATER);
         when(loanService.loanBook("Ana", "Clean Code", loan.getReturnDate())).thenReturn(loan);
 
         ResponseEntity<LoanDTO> response = loanController
-            .loanBook(new LoanDTO("Clean Code", "Ana", null, loan.getReturnDate(), null));
+            .loanBook(new LoanDTO("l-1", "Ana","Clean Code",  null, loan.getReturnDate(), null));
 
         assertEquals(HttpStatus.CREATED, response.getStatusCode());
         assertNotNull(response.getBody());
@@ -63,10 +63,8 @@ class LoanControllerTest {
 
     @Test
     void getLoansShouldReturnAllLoans() {
-        Loan loan1 = new Loan(new Book("Book 1", "Author 1", "b-1"), new User("u-1", "Ana"),
-                TWO_DAYS_LATER);
-        Loan loan2 = new Loan(new Book("Book 2", "Author 2", "b-2"), new User("u-2", "Luis"),
-                FOUR_DAYS_LATER);
+        Loan loan1 = new Loan("l-1", new User("u-1", "Ana", "ana123", "hash"), new Book("b-1", "Book 1", "Author 1", 21), TWO_DAYS_LATER);
+        Loan loan2 = new Loan("l-2", new User("u-2", "Luis", "luis123", "hash"), new Book("b-2", "Book 2", "Author 2", 21), FOUR_DAYS_LATER);
         when(loanService.getAllLoans()).thenReturn(List.of(loan1, loan2));
 
         ResponseEntity<List<LoanDTO>> response = loanController.getLoans();
@@ -84,7 +82,7 @@ class LoanControllerTest {
         LocalDate returnDate = FIVE_DAYS_LATER;
         when(loanService.loanBook("Ana", "Clean Code", returnDate)).thenThrow(new LoanLimitExceededException());
 
-        LoanDTO requestDTO = new LoanDTO("Clean Code", "Ana", null, returnDate, null);
+        LoanDTO requestDTO = new LoanDTO("l-1", "Ana", "Clean Code", null, returnDate, null);
         LoanLimitExceededException ex = assertThrows(LoanLimitExceededException.class,
                 () -> loanController.loanBook(requestDTO));
         assertNotNull(ex.getMessage());
@@ -93,27 +91,25 @@ class LoanControllerTest {
     }
 
     @Test
-    void getLoansByUserNameShouldReturnLoansForThatUser() {
+    void getLoansByUsernameShouldReturnLoansForThatUser() {
         String userName = "Ana";
-        Loan loan = new Loan(new Book("Clean Code", "Robert C. Martin", "b-1"), new User("u-1", userName),
-                SEVEN_DAYS_LATER);
-        when(loanService.getLoansByUserName(userName)).thenReturn(List.of(loan));
+        Loan loan = new Loan("l-1", new User("u-1", userName, "ana123", "hash"), new Book("b-1", "Clean Code", "Robert C. Martin", 21), SEVEN_DAYS_LATER);
+        when(loanService.getLoansByUsername(userName)).thenReturn(List.of(loan));
 
-        ResponseEntity<List<LoanDTO>> response = loanController.getLoansByUserName(userName);
+        ResponseEntity<List<LoanDTO>> response = loanController.getLoansByUsername(userName);
 
         assertEquals(HttpStatus.OK, response.getStatusCode());
         assertNotNull(response.getBody());
         assertEquals(1, response.getBody().size());
         assertEquals("Clean Code", response.getBody().get(0).getBookTitle());
         assertEquals(userName, response.getBody().get(0).getUserName());
-        verify(loanService).getLoansByUserName(userName);
+        verify(loanService).getLoansByUsername(userName);
     }
 
     @Test
     void getActiveLoansByUserNameShouldReturnActiveLoansForThatUser() {
         String userName = "Ana";
-        Loan loan = new Loan(new Book("Clean Code", "Robert C. Martin", "b-1"), new User("u-1", userName),
-                SEVEN_DAYS_LATER);
+        Loan loan = new Loan("l-1", new User("u-1", userName, "ana123", "hash"), new Book("b-1", "Clean Code", "Robert C. Martin", 21), SEVEN_DAYS_LATER);
         when(loanService.getActiveLoansByUserName(userName)).thenReturn(List.of(loan));
 
         ResponseEntity<List<LoanDTO>> response = loanController.getActiveLoansByUserName(userName);
@@ -128,8 +124,7 @@ class LoanControllerTest {
 
     @Test
     void getActiveLoansShouldReturnOnlyActiveLoansCrossAllUsers() {
-        Loan loan1 = new Loan(new Book("Clean Code", "Robert C. Martin", "b-1"), new User("u-1", "Ana"),
-                SEVEN_DAYS_LATER);
+        Loan loan1 = new Loan("l-1", new User("u-1", "Ana", "ana123", "hash"), new Book("b-1", "Clean Code", "Robert C. Martin", 21), SEVEN_DAYS_LATER);
         when(loanService.getActiveLoans()).thenReturn(List.of(loan1));
 
         ResponseEntity<List<LoanDTO>> response = loanController.getActiveLoans();
@@ -142,8 +137,7 @@ class LoanControllerTest {
 
     @Test
     void getReturnedLoansShouldReturnOnlyReturnedLoans() {
-        Loan loan1 = new Loan(new Book("Clean Code", "Robert C. Martin", "b-1"), new User("u-1", "Ana"),
-                SEVEN_DAYS_LATER);
+        Loan loan1 = new Loan("l-1", new User("u-1", "Ana", "ana123", "hash"), new Book("b-1", "Clean Code", "Robert C. Martin", 21), SEVEN_DAYS_LATER);
         loan1.setStatus(StatusLoanEnum.RETURNED);
         when(loanService.getReturnedLoans()).thenReturn(List.of(loan1));
 

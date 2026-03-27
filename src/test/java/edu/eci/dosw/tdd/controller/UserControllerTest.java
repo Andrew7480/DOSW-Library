@@ -9,7 +9,9 @@ import static org.mockito.Mockito.when;
 import java.util.List;
 
 import edu.eci.dosw.tdd.controller.dto.UserDTO;
+import edu.eci.dosw.tdd.controller.mapper.UserMapper;
 import edu.eci.dosw.tdd.core.exception.UserNotFoundException;
+import edu.eci.dosw.tdd.core.model.Role;
 import edu.eci.dosw.tdd.core.model.User;
 import edu.eci.dosw.tdd.core.service.UserService;
 import org.junit.jupiter.api.BeforeEach;
@@ -35,23 +37,23 @@ class UserControllerTest {
 
     @Test
     void registerUserShouldReturnCreatedUser() {
-        User requestModel = new User("u-1", "Ana");
-        when(userService.registerUser("Ana")).thenReturn(requestModel);
+        User requestModel = new User("u-1", "Ana", "ana123", "hash", Role.USER);
+        when(userService.registerUser("Ana", "ana123", "hash", Role.USER)).thenReturn(requestModel);
 
-        ResponseEntity<UserDTO> response = userController.registerUser(new UserDTO( "Ana"));
+        ResponseEntity<UserDTO> response = userController.registerUser(UserMapper.toDTO(requestModel));
 
         assertEquals(HttpStatus.CREATED, response.getStatusCode());
         assertNotNull(response.getBody());
         assertEquals("u-1", response.getBody().getId());
         assertEquals("Ana", response.getBody().getName());
-        verify(userService).registerUser("Ana");
+        verify(userService).registerUser("Ana", "ana123", "hash", Role.USER);
     }
 
     @Test
     void getUsersShouldReturnAllUsers() {
         when(userService.getUsers()).thenReturn(List.of(
-                new User("u-1", "Ana"),
-                new User("u-2", "Luis")));
+                new User("u-1", "Ana", "ana123", "hash"),
+                new User("u-2", "Luis", "luis123", "hash")));
 
         ResponseEntity<List<UserDTO>> response = userController.getUsers();
 
@@ -65,7 +67,7 @@ class UserControllerTest {
 
     @Test
     void getUserByIdShouldReturnUserWhenExists() {
-        when(userService.getUserById("u-1")).thenReturn(new User("u-1", "Ana"));
+        when(userService.getUserById("u-1")).thenReturn(new User("u-1", "Ana", "ana123", "hash"));
 
         ResponseEntity<UserDTO> response = userController.getUserById("u-1");
 
@@ -88,18 +90,18 @@ class UserControllerTest {
     }
 
     @Test
-    void getUserByNameShouldReturnUserWhenExists() {
-        String name = "Maria";
-        when(userService.getUserByName(name)).thenReturn(new User("u-3", name));
+    void getUserByUsernameShouldReturnUserWhenExists() {
+        String username = "Maria";
+        when(userService.getUserByUsername(username)).thenReturn(new User("u-3", username, "maria123", "hash"));
 
-        ResponseEntity<UserDTO> response = userController.getUserByName(name);
+        ResponseEntity<UserDTO> response = userController.getUserByUsername(username);
 
         assertEquals(HttpStatus.OK, response.getStatusCode());
         assertNotNull(response.getBody());
         assertEquals("u-3", response.getBody().getId());
-        assertEquals(name, response.getBody().getName());
+        assertEquals(username, response.getBody().getName());
 
-        verify(userService).getUserByName(name);
+        verify(userService).getUserByUsername(username);
     }
 
 }

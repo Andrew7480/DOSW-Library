@@ -77,7 +77,11 @@ El sistema implementa validaciones exhaustivas, manejo de errores estructurado y
 - DTOs mapean modelos a JSON
 - Excepciones heredan de `LibraryException`
 
----
+### 4. Modelo de Entidad Relacion
+
+![Diagrama de Clases](docs/image/ModeloEntidadRelacion.png)
+
+--
 
 ## Swagger/OpenAPI
 
@@ -115,7 +119,7 @@ http://localhost:8080/swagger-ui.html
 
 ---
 
-## Video Demo
+## Video Demo 
 
 Video de demostración del proyecto:
 
@@ -123,4 +127,10 @@ Video de demostración del proyecto:
 
 
 ---
+
+## Video Demo con persistencia
+
+Video de demostración del proyecto:
+
+[Ver video](docs/image/funcionalidadesPersistencia.mp4)
 
