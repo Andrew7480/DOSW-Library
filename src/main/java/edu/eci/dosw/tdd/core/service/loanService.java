@@ -11,8 +11,8 @@ import edu.eci.dosw.tdd.core.model.StatusLoanEnum;
 import edu.eci.dosw.tdd.core.model.User;
 import edu.eci.dosw.tdd.core.util.IdGeneratorUtil;
 import edu.eci.dosw.tdd.core.validator.LoanValidator;
-import edu.eci.dosw.tdd.persistence.mapper.LoanEntityMapper;
-import edu.eci.dosw.tdd.persistence.repository.LoanRepository;
+import edu.eci.dosw.tdd.persistence.relational.mapper.LoanEntityMapper;
+import edu.eci.dosw.tdd.persistence.relational.repository.LoanRepository;
 import lombok.Data;
 
 import org.springframework.stereotype.Service;

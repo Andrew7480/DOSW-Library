@@ -1,6 +1,11 @@
 spring:
   application:
     name: DOSW-Library
+  data: 
+    mongodb:
+      uri: mongodb+srv://andress_db_user:Hola123@cluster0.salamb7.mongodb.net/?appName=Cluster0
+      database: dosw_library
+      
   datasource:
     url: jdbc:postgresql://localhost:5432/dosw_library
     username: postgres

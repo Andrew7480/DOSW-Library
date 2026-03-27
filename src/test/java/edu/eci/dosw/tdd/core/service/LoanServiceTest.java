@@ -19,15 +19,15 @@ import edu.eci.dosw.tdd.core.model.Book;
 import edu.eci.dosw.tdd.core.model.Loan;
 import edu.eci.dosw.tdd.core.model.StatusLoanEnum;
 import edu.eci.dosw.tdd.core.model.User;
-import edu.eci.dosw.tdd.persistence.mapper.LoanEntityMapper;
-import edu.eci.dosw.tdd.persistence.entity.LoanEntity;
+import edu.eci.dosw.tdd.persistence.relational.entity.LoanEntity;
+import edu.eci.dosw.tdd.persistence.relational.mapper.LoanEntityMapper;
+import edu.eci.dosw.tdd.persistence.relational.repository.LoanRepository;
+
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
-
-import edu.eci.dosw.tdd.persistence.repository.LoanRepository;
 
 
 @ExtendWith(MockitoExtension.class)

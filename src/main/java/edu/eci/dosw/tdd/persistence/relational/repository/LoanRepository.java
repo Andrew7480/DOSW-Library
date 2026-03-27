@@ -1,4 +1,4 @@
-package edu.eci.dosw.tdd.persistence.repository;
+package edu.eci.dosw.tdd.persistence.relational.repository;
 
 import java.time.LocalDate;
 import java.util.List;
@@ -6,9 +6,8 @@ import java.util.Optional;
 
 import org.springframework.data.jpa.repository.JpaRepository;
 
-
-import edu.eci.dosw.tdd.persistence.entity.LoanEntity;
 import edu.eci.dosw.tdd.core.model.StatusLoanEnum;
+import edu.eci.dosw.tdd.persistence.relational.entity.LoanEntity;
 
 public interface LoanRepository extends JpaRepository<LoanEntity, String> {
 	// Préstamos de un usuario segun status

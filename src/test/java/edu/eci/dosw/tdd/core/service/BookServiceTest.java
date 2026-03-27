@@ -13,8 +13,9 @@ import org.mockito.ArgumentCaptor;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
-import edu.eci.dosw.tdd.persistence.repository.BookRepository;
-import edu.eci.dosw.tdd.persistence.entity.BookEntity;
+
+import edu.eci.dosw.tdd.persistence.relational.entity.BookEntity;
+import edu.eci.dosw.tdd.persistence.relational.repository.BookRepository;
 import edu.eci.dosw.tdd.core.exception.BookAlreadyExitsException;
 import edu.eci.dosw.tdd.core.exception.BookNotAvailableException;
 import edu.eci.dosw.tdd.core.exception.BookNotFoundException;

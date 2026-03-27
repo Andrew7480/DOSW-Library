@@ -9,8 +9,8 @@ import edu.eci.dosw.tdd.core.model.User;
 import edu.eci.dosw.tdd.core.util.IdGeneratorUtil;
 import edu.eci.dosw.tdd.core.util.PasswordHashUtil;
 import edu.eci.dosw.tdd.core.validator.UserValidator;
-import edu.eci.dosw.tdd.persistence.mapper.UserEntityMapper;
-import edu.eci.dosw.tdd.persistence.repository.UserRepository;
+import edu.eci.dosw.tdd.persistence.relational.mapper.UserEntityMapper;
+import edu.eci.dosw.tdd.persistence.relational.repository.UserRepository;
 import lombok.Data;
 
 import org.springframework.stereotype.Service;
