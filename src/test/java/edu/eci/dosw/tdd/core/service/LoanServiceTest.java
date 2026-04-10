@@ -3,8 +3,8 @@ package edu.eci.dosw.tdd.core.service;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
-import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 import static org.mockito.ArgumentMatchers.any;
@@ -260,5 +260,74 @@ class LoanServiceTest {
         assertEquals(1, activeLoans.size());
         assertEquals(StatusLoanEnum.ACTIVE, activeLoans.get(0).getStatus());
         assertEquals(userName, activeLoans.get(0).getUser().getUsername());
+    }
+
+    @Test
+    void givenOneReservationWhenConsultByIdAtServiceThenQueryIsSuccessfulValidatingId() {
+        String loanId = "loan-1";
+        Book book = new Book("b-1", "Clean Code", "Robert C. Martin", 2);
+        User user = new User("u-1", "ana", "Ana", "hash");
+        Loan reservation = new Loan(loanId, user, book, WEEK_LATER);
+
+        when(loanRepository.findById(loanId)).thenReturn(Optional.of(reservation));
+
+        Optional<Loan> result = loanService.getLoanById(loanId);
+
+        assertTrue(result.isPresent());
+        assertEquals(loanId, result.get().getId());
+    }
+
+    @Test
+    void givenNoReservationWhenConsultByIdAtServiceThenNoResultIsReturned() {
+        String loanId = "missing-loan";
+
+        when(loanRepository.findById(loanId)).thenReturn(Optional.empty());
+
+        Optional<Loan> result = loanService.getLoanById(loanId);
+
+        assertTrue(result.isEmpty());
+    }
+
+    @Test
+    void givenNoReservationWhenCreateAtServiceThenCreationIsSuccessful() {
+        String loanId = "new-loan";
+        Book book = new Book("b-2", "Refactoring", "Martin Fowler", 2);
+        User user = new User("u-2", "luis", "Luis", "hash");
+        Loan reservation = new Loan(loanId, user, book, WEEK_LATER);
+
+        when(loanRepository.save(reservation)).thenReturn(reservation);
+
+        Loan created = loanService.createLoan(reservation);
+
+        assertNotNull(created);
+        assertEquals(loanId, created.getId());
+        verify(loanRepository).save(reservation);
+    }
+
+    @Test
+    void givenOneReservationWhenDeleteAtServiceThenDeletionIsSuccessful() {
+        String loanId = "loan-to-delete";
+
+        loanService.deleteLoan(loanId);
+
+        verify(loanRepository).delete(loanId);
+    }
+
+    @Test
+    void givenOneReservationWhenDeleteAndConsultAtServiceThenNoResultIsReturned() {
+        String loanId = "loan-delete-and-consult";
+        Book book = new Book("b-3", "DDD", "Eric Evans", 2);
+        User user = new User("u-3", "sofia", "Sofia", "hash");
+        Loan reservation = new Loan(loanId, user, book, WEEK_LATER);
+
+        when(loanRepository.findById(loanId)).thenReturn(Optional.of(reservation), Optional.empty());
+
+        Optional<Loan> beforeDelete = loanService.getLoanById(loanId);
+        loanService.deleteLoan(loanId);
+        Optional<Loan> afterDelete = loanService.getLoanById(loanId);
+
+        assertTrue(beforeDelete.isPresent());
+        assertTrue(afterDelete.isEmpty());
+        verify(loanRepository).delete(loanId);
     }
 }

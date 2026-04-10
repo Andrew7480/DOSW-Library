@@ -9,6 +9,7 @@ import java.util.Optional;
 import java.util.List;
 
 import static org.mockito.Mockito.*;
+import static org.mockito.ArgumentMatchers.any;
 import org.mockito.ArgumentCaptor;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
@@ -42,6 +43,7 @@ class BookServiceTest {
         int copies = 3;
 
         when(bookRepository.findByTitleIgnoreCase(title)).thenReturn(Optional.empty());
+        when(bookRepository.save(any(Book.class))).thenAnswer(invocation -> invocation.getArgument(0));
 
         ArgumentCaptor<Book> captor = ArgumentCaptor.forClass(Book.class);
         Book created = bookService.addBook(title, author, copies);

@@ -2,6 +2,7 @@ package edu.eci.dosw.tdd.core.service;
 
 import java.time.LocalDate;
 import java.util.List;
+import java.util.Optional;
 
 import edu.eci.dosw.tdd.core.exception.LoanLimitExceededException;
 import edu.eci.dosw.tdd.core.exception.LoanNotFoundException;
@@ -48,6 +49,18 @@ public class LoanService{
 
     public List<Loan> getAllLoans() {
         return loanRepository.findAll();
+    }
+
+    public Optional<Loan> getLoanById(String id) {
+        return loanRepository.findById(id);
+    }
+
+    public Loan createLoan(Loan loan) {
+        return loanRepository.save(loan);
+    }
+
+    public void deleteLoan(String id) {
+        loanRepository.delete(id);
     }
 
     public List<Loan> getLoansByUsername(String userName) {
