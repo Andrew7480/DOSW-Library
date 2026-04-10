@@ -6,11 +6,10 @@ import edu.eci.dosw.tdd.core.exception.UserNameAlreadyExistsException;
 import edu.eci.dosw.tdd.core.exception.UserNotFoundException;
 import edu.eci.dosw.tdd.core.model.Role;
 import edu.eci.dosw.tdd.core.model.User;
+import edu.eci.dosw.tdd.core.repository.UserRepository;
 import edu.eci.dosw.tdd.core.util.IdGeneratorUtil;
 import edu.eci.dosw.tdd.core.util.PasswordHashUtil;
 import edu.eci.dosw.tdd.core.validator.UserValidator;
-import edu.eci.dosw.tdd.persistence.relational.mapper.UserEntityMapper;
-import edu.eci.dosw.tdd.persistence.relational.repository.UserRepository;
 import lombok.Data;
 
 import org.springframework.stereotype.Service;
@@ -34,8 +33,7 @@ public class UserService {
 
         String id = IdGeneratorUtil.generateId();
         User user = new User(id, name, username, PasswordHashUtil.hashPassword(passwordHash));
-        userRepository.save(UserEntityMapper.toEntity(user));
-        return user;
+        return userRepository.save(user);
     }
 
     public User registerUser(String name, String username, String passwordHash, Role role){
@@ -43,20 +41,19 @@ public class UserService {
         validateUserNameNotDuplicate(username);
         String id = IdGeneratorUtil.generateId();
         User user = new User(id, name, username, PasswordHashUtil.hashPassword(passwordHash), role);
-        userRepository.save(UserEntityMapper.toEntity(user));
-        return user;
+        return userRepository.save(user);
     }
 
     public List<User> getUsers(){
-        return userRepository.findAll().stream().map(UserEntityMapper::toModel).toList();
+        return userRepository.findAll();
     }
 
     public User getUserById(String id){
-        return userRepository.findById(id).map(UserEntityMapper::toModel).orElseThrow(() -> new UserNotFoundException(id));
+        return userRepository.findById(id).orElseThrow(() -> new UserNotFoundException(id));
     }
 
     public User getUserByUsername(String username){
-        return userRepository.findByUsername(username).map(UserEntityMapper::toModel).orElseThrow(() -> new UserNotFoundException(username));
+        return userRepository.findByUsername(username).orElseThrow(() -> new UserNotFoundException(username));
     }
 
     private void validateUserNameNotDuplicate(String username) {

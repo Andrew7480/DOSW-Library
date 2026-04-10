@@ -14,8 +14,7 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
 
-import edu.eci.dosw.tdd.persistence.relational.entity.BookEntity;
-import edu.eci.dosw.tdd.persistence.relational.repository.BookRepository;
+import edu.eci.dosw.tdd.core.repository.BookRepository;
 import edu.eci.dosw.tdd.core.exception.BookAlreadyExitsException;
 import edu.eci.dosw.tdd.core.exception.BookNotAvailableException;
 import edu.eci.dosw.tdd.core.exception.BookNotFoundException;
@@ -44,7 +43,7 @@ class BookServiceTest {
 
         when(bookRepository.findByTitleIgnoreCase(title)).thenReturn(Optional.empty());
 
-        ArgumentCaptor<BookEntity> captor = ArgumentCaptor.forClass(BookEntity.class);
+        ArgumentCaptor<Book> captor = ArgumentCaptor.forClass(Book.class);
         Book created = bookService.addBook(title, author, copies);
 
         assertNotNull(created);
@@ -57,9 +56,9 @@ class BookServiceTest {
 
     @Test
     void getAllBooksShouldReturnAllRegisteredBooks() {
-        BookEntity entity1 = new BookEntity("id1", "Book 1", "Author 1", 2, 2);
-        BookEntity entity2 = new BookEntity("id2", "Book 2", "Author 2", 1, 1);
-        when(bookRepository.findAll()).thenReturn(List.of(entity1, entity2));
+        Book book1 = new Book("id1", "Book 1", "Author 1", 2, 2);
+        Book book2 = new Book("id2", "Book 2", "Author 2", 1, 1);
+        when(bookRepository.findAll()).thenReturn(List.of(book1, book2));
         int totalBooks = bookService.getAllBooks().size();
         assertEquals(2, totalBooks);
     }
@@ -67,8 +66,8 @@ class BookServiceTest {
     @Test
     void getBookByTitleShouldReturnExistingBook() {
         String title = "Domain-Driven Design";
-        BookEntity entity = new BookEntity("id1", title, "Eric Evans", 2, 2);
-        when(bookRepository.findByTitleIgnoreCase(title)).thenReturn(Optional.of(entity));
+        Book book = new Book("id1", title, "Eric Evans", 2, 2);
+        when(bookRepository.findByTitleIgnoreCase(title)).thenReturn(Optional.of(book));
         Book found = bookService.getBook(title);
         assertEquals("id1", found.getId());
         assertEquals(title, found.getTitle());
@@ -83,25 +82,25 @@ class BookServiceTest {
     @Test
     void addBookShouldThrowWhenTitleIsDuplicate() {
         String title = "Clean Code";
-        BookEntity entity = new BookEntity("id1", title, "Robert C. Martin", 3, 2);
-        when(bookRepository.findByTitleIgnoreCase(title.trim().toLowerCase())).thenReturn(Optional.of(entity));
+        Book book = new Book("id1", title, "Robert C. Martin", 3, 2);
+        when(bookRepository.findByTitleIgnoreCase(title.trim().toLowerCase())).thenReturn(Optional.of(book));
         assertThrows(BookAlreadyExitsException.class, () -> bookService.addBook(title, "Another Author", 2));
     }
 
     @Test
     void getAvailableCopiesShouldReturnCorrectAmount() {
         String title = "Refactoring";
-        BookEntity entity = new BookEntity("id1", title, "Martin Fowler", 5, 5);
-        when(bookRepository.findByTitleIgnoreCase(title)).thenReturn(Optional.of(entity));
+        Book book = new Book("id1", title, "Martin Fowler", 5, 5);
+        when(bookRepository.findByTitleIgnoreCase(title)).thenReturn(Optional.of(book));
         int copies = bookService.getAvailableCopies(title);
         assertEquals(5, copies);
     }
 
     @Test
     void getAvailableBooksShouldReturnOnlyBooksWithCopies() {
-        BookEntity entity1 = new BookEntity("id1", "Available Book", "Author 1", 2, 2);
-        BookEntity entity2 = new BookEntity("id2", "Another Available Book", "Author 2", 1, 1);
-        when(bookRepository.findAllByAvailableStockGreaterThan(0)).thenReturn(List.of(entity1, entity2));
+        Book book1 = new Book("id1", "Available Book", "Author 1", 2, 2);
+        Book book2 = new Book("id2", "Another Available Book", "Author 2", 1, 1);
+        when(bookRepository.findAllByAvailableStockGreaterThan(0)).thenReturn(List.of(book1, book2));
         int availableCount = bookService.getAvailableBooks().size();
         assertEquals(2, availableCount);
     }
@@ -109,8 +108,8 @@ class BookServiceTest {
     @Test
     void isBookAvailableShouldReturnTrueWhenCopiesGreaterThanZero() {
         String title = "Design Patterns";
-        BookEntity entity = new BookEntity("id1", title, "Gang of Four", 3, 3);
-        when(bookRepository.findByTitleIgnoreCase(title)).thenReturn(Optional.of(entity));
+        Book book = new Book("id1", title, "Gang of Four", 3, 3);
+        when(bookRepository.findByTitleIgnoreCase(title)).thenReturn(Optional.of(book));
         boolean available = bookService.isBookAvailable(title);
         assertTrue(available);
     }
@@ -124,8 +123,8 @@ class BookServiceTest {
     @Test
     void updateAvailabilityShouldChangeAvailableCopies() {
         String title = "Test Book";
-        BookEntity entity = new BookEntity("id1", title, "Test Author", 2, 2);
-        when(bookRepository.findByTitleIgnoreCase(title)).thenReturn(Optional.of(entity));
+        Book book = new Book("id1", title, "Test Author", 2, 2);
+        when(bookRepository.findByTitleIgnoreCase(title)).thenReturn(Optional.of(book));
         bookService.updateAvailability(title, 5);
         verify(bookRepository).save(argThat(e -> e.getAvailableStock() == 5));
     }
@@ -139,8 +138,8 @@ class BookServiceTest {
     @Test
     void increaseAvailableCopiesShouldAddCopiesToBook() {
         String title = "Clean Code";
-        BookEntity entity = new BookEntity("id1", title, "Robert C. Martin", 2, 2);
-        when(bookRepository.findByTitleIgnoreCase(title)).thenReturn(Optional.of(entity));
+        Book book = new Book("id1", title, "Robert C. Martin", 2, 2);
+        when(bookRepository.findByTitleIgnoreCase(title)).thenReturn(Optional.of(book));
         bookService.increaseAvailableCopies(title, 3);
         verify(bookRepository).save(argThat(e -> e.getAvailableStock() == 5));
     }
@@ -154,8 +153,8 @@ class BookServiceTest {
     @Test
     void decreaseAvailableCopiesShouldSubtractCopiesWhenEnoughStock() {
         String title = "Refactoring";
-        BookEntity entity = new BookEntity("id1", title, "Martin Fowler", 5, 5);
-        when(bookRepository.findByTitleIgnoreCase(title)).thenReturn(Optional.of(entity));
+        Book book = new Book("id1", title, "Martin Fowler", 5, 5);
+        when(bookRepository.findByTitleIgnoreCase(title)).thenReturn(Optional.of(book));
         bookService.decreaseAvailableCopies(title, 2);
         verify(bookRepository).save(argThat(e -> e.getAvailableStock() == 3));
     }
@@ -163,8 +162,8 @@ class BookServiceTest {
     @Test
     void decreaseAvailableCopiesShouldThrowWhenCopiesRequestedExceedAvailable() {
         String title = "Domain-Driven Design";
-        BookEntity entity = new BookEntity("id1", title, "Eric Evans", 1, 1);
-        when(bookRepository.findByTitleIgnoreCase(title)).thenReturn(Optional.of(entity));
+        Book book = new Book("id1", title, "Eric Evans", 1, 1);
+        when(bookRepository.findByTitleIgnoreCase(title)).thenReturn(Optional.of(book));
         assertThrows(BookNotAvailableException.class, () -> bookService.decreaseAvailableCopies(title, 2));
     }
 

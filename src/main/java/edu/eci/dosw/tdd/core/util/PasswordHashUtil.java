@@ -4,6 +4,9 @@ import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 
 public final class PasswordHashUtil {
 
+    private PasswordHashUtil() {
+    }
+
     private static final BCryptPasswordEncoder encoder = new BCryptPasswordEncoder();
 
     public static String hashPassword(String password) {

@@ -13,7 +13,6 @@ public class UserDTO {
     private String username;
     @NotBlank(message = "Password is required")
     private String password;
-    @NotBlank(message = "Role is required")
     private String role;
 
     public UserDTO() {
