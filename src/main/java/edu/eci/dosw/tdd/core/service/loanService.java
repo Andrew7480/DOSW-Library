@@ -11,8 +11,7 @@ import edu.eci.dosw.tdd.core.model.StatusLoanEnum;
 import edu.eci.dosw.tdd.core.model.User;
 import edu.eci.dosw.tdd.core.util.IdGeneratorUtil;
 import edu.eci.dosw.tdd.core.validator.LoanValidator;
-import edu.eci.dosw.tdd.persistence.mapper.LoanEntityMapper;
-import edu.eci.dosw.tdd.persistence.repository.LoanRepository;
+import edu.eci.dosw.tdd.core.repository.LoanRepository;
 import lombok.Data;
 
 import org.springframework.stereotype.Service;
@@ -32,6 +31,8 @@ public class LoanService{
         this.bookService = bookService;
         this.userService = userService;
     }
+
+
     
     public Loan loanBook(String userName, String booktitle, LocalDate returnDate) {
         User user = userService.getUserByUsername(userName);
@@ -41,34 +42,31 @@ public class LoanService{
         canLoanBook(user, book);
         bookService.decreaseAvailableCopies(booktitle, 1);
         Loan loan = new Loan(IdGeneratorUtil.generateId(), user, book, returnDate);
-        loanRepository.save(LoanEntityMapper.toEntity(loan));
+        loanRepository.save(loan);
         return loan;
     }
 
     public List<Loan> getAllLoans() {
-        return loanRepository.findAll().stream().map(LoanEntityMapper::toModel).toList();
+        return loanRepository.findAll();
     }
 
     public List<Loan> getLoansByUsername(String userName) {
-        return loanRepository.findByUser_Username(userName).stream().map(LoanEntityMapper::toModel).toList();
+        return loanRepository.findByUsername(userName);
     }
 
     public boolean userHasActiveLoan(String userName) {
-        return loanRepository.findByUser_Username(userName).stream()
-                .map(LoanEntityMapper::toModel)
+        return loanRepository.findByUsername(userName).stream()
                 .anyMatch(loan -> loan.getStatus() == StatusLoanEnum.ACTIVE);
     }
 
     public List<Loan> getActiveLoans() {
         return loanRepository.findAll().stream()
-                .map(LoanEntityMapper::toModel)
                 .filter(loan -> loan.getStatus() == StatusLoanEnum.ACTIVE)
                 .toList();
     }
 
     public List<Loan> getReturnedLoans() {
         return loanRepository.findAll().stream()
-                .map(LoanEntityMapper::toModel)
                 .filter(loan -> loan.getStatus() == StatusLoanEnum.RETURNED)
                 .toList();
     }
@@ -76,15 +74,13 @@ public class LoanService{
     public List<Loan> getOverdueLoans() {
         LocalDate today = LocalDate.now();
         return loanRepository.findAll().stream()
-                .map(LoanEntityMapper::toModel)
                 .filter(loan -> loan.getStatus() == StatusLoanEnum.ACTIVE)
                 .filter(loan -> loan.getReturnDate().isBefore(today))
                 .toList();
     }
 
     public List<Loan> getActiveLoansByUserName(String userName) {
-        return loanRepository.findByUser_Username(userName).stream()
-                .map(LoanEntityMapper::toModel)
+        return loanRepository.findByUsername(userName).stream()
                 .filter(loan -> loan.getStatus() == StatusLoanEnum.ACTIVE)
                 .toList();
     }
@@ -94,12 +90,11 @@ public class LoanService{
         Book book = bookService.getBook(booktitle);
         LoanValidator.validateLoanRequest(user.getId(), book.getId(), LocalDate.now());
 
-        Loan loan = loanRepository.findByUser_UsernameAndBook_Title(userName, booktitle)
-                .map(LoanEntityMapper::toModel)
+        Loan loan = loanRepository.findByUsernameAndBookTitle(userName, booktitle)
                 .orElseThrow(() -> new LoanNotFoundException(userName, booktitle));
 
         loan.setStatus(StatusLoanEnum.RETURNED);
-        loanRepository.save(LoanEntityMapper.toEntity(loan));
+        loanRepository.save(loan);
         bookService.increaseAvailableCopies(booktitle, 1);
     }
 
@@ -107,8 +102,7 @@ public class LoanService{
 
         bookService.isBookAvailable(book.getTitle());
 
-        long activeLoans = loanRepository.findByUser_Username(user.getUsername()).stream()
-                .map(LoanEntityMapper::toModel)
+        long activeLoans = loanRepository.findByUsername(user.getUsername()).stream()
                 .filter(loan -> loan.getStatus() == StatusLoanEnum.ACTIVE)
                 .count();
 

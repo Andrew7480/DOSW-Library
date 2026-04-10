@@ -9,11 +9,9 @@ import edu.eci.dosw.tdd.core.exception.BookNotAvailableException;
 import edu.eci.dosw.tdd.core.exception.BookNotFoundException;
 import edu.eci.dosw.tdd.core.exception.InvalidInputException;
 import edu.eci.dosw.tdd.core.model.Book;
+import edu.eci.dosw.tdd.core.repository.BookRepository;
 import edu.eci.dosw.tdd.core.util.IdGeneratorUtil;
 import edu.eci.dosw.tdd.core.validator.BookValidator;
-import edu.eci.dosw.tdd.persistence.entity.BookEntity;
-import edu.eci.dosw.tdd.persistence.mapper.BookEntityMapper;
-import edu.eci.dosw.tdd.persistence.repository.BookRepository;
 import lombok.Data;
 
 import org.springframework.stereotype.Service;
@@ -37,37 +35,36 @@ public class BookService {
         BookValidator.validateCreateBook(title, author, copies);
         verifyBookNotDuplicate(title);
         Book book = new Book(IdGeneratorUtil.generateId(), title, author, copies, copies);
-        bookRepository.save(BookEntityMapper.toEntity(book));
-        return book;
+        return bookRepository.save(book);
     }
 
     public Map<Book, Integer> getAllBooksWithCopies(){
-        return bookRepository.findAll().stream().collect(HashMap::new, (map, entity) -> map.put(BookEntityMapper.toModel(entity), entity.getAvailableStock()), HashMap::putAll);
+        return bookRepository.findAll().stream().collect(HashMap::new, (map, book) -> map.put(book, book.getAvailableStock()), HashMap::putAll);
     }
 
     public List<Book> getAllBooks(){
-        return bookRepository.findAll().stream().map(BookEntityMapper::toModel).toList();
+        return bookRepository.findAll();
     }
 
     public List<Book> getAllBooksByAuthor(String author) {
-        return bookRepository.findAllByAuthorIgnoreCase(author).stream().map(BookEntityMapper::toModel).toList();
+        return bookRepository.findAllByAuthorIgnoreCase(author);
     }
 
     public List<Book> getAvailableBooks(){
-        return bookRepository.findAllByAvailableStockGreaterThan(0).stream().map(BookEntityMapper::toModel).toList();
+        return bookRepository.findAllByAvailableStockGreaterThan(0);
     }
     
     public boolean isBookAvailable(String title) {
-        var entity = findBookEntityByTitleOrThrow(title);
-        return entity.getAvailableStock() > 0;
+        var book = findBookByTitleOrThrow(title);
+        return book.getAvailableStock() > 0;
     }
 
     public int getAvailableCopies(String title) {
-        return findBookEntityByTitleOrThrow(title).getAvailableStock();
+        return findBookByTitleOrThrow(title).getAvailableStock();
     }
     
     public Book getBook(String title) {
-        return BookEntityMapper.toModel(findBookEntityByTitleOrThrow(title));
+        return findBookByTitleOrThrow(title);
     }
 
     public boolean bookExists(String title) {
@@ -75,28 +72,28 @@ public class BookService {
     }
 
     public void increaseAvailableCopies(String title, int copies) {
-        BookEntity entity = findBookEntityByTitleOrThrow(title);
-        entity.setAvailableStock(entity.getAvailableStock() + copies);
-        bookRepository.save(entity);
+        Book book = findBookByTitleOrThrow(title);
+        book.setAvailableStock(book.getAvailableStock() + copies);
+        bookRepository.save(book);
     }
 
     public void decreaseAvailableCopies(String title, int copies) {
-        BookEntity entity = findBookEntityByTitleOrThrow(title);
-        int availableCopies = entity.getAvailableStock();
+        Book book = findBookByTitleOrThrow(title);
+        int availableCopies = book.getAvailableStock();
         if (availableCopies < copies) {
             throw new BookNotAvailableException(title);
         }
-        entity.setAvailableStock(availableCopies - copies);
-        bookRepository.save(entity);
+        book.setAvailableStock(availableCopies - copies);
+        bookRepository.save(book);
     }
 
     public void updateAvailability(String title, int copies) {
         if (copies < 0) {
             throw new InvalidInputException("Available copies cannot be negative");
         }
-        BookEntity entity = findBookEntityByTitleOrThrow(title);
-        entity.setAvailableStock(copies);
-        bookRepository.save(entity);
+        Book book = findBookByTitleOrThrow(title);
+        book.setAvailableStock(copies);
+        bookRepository.save(book);
     }
 
     private void verifyBookNotDuplicate(String title) {
@@ -106,7 +103,7 @@ public class BookService {
         }
     }
 
-    private BookEntity findBookEntityByTitleOrThrow(String title) {
+    private Book findBookByTitleOrThrow(String title) {
         return bookRepository.findByTitleIgnoreCase(title)
             .orElseThrow(() -> new BookNotFoundException(title));
     }

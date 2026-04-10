@@ -134,3 +134,18 @@ Video de demostración del proyecto:
 
 [Ver video](docs/image/funcionalidadesPersistencia.mp4)
 
+
+
+---
+
+## Diagrama No relacional
+
+![alt text](docs/image/norelational.png)
+![alt text](docs/image/norelational1.png)
+
+
+---
+
+## Video Demo persistencia no relacional
+
+[Ver video](docs/image/funcionalidadesPersistencia.mp4)

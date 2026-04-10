@@ -9,8 +9,7 @@ import edu.eci.dosw.tdd.core.exception.InvalidInputException;
 import edu.eci.dosw.tdd.core.exception.UserNameAlreadyExistsException;
 import edu.eci.dosw.tdd.core.exception.UserNotFoundException;
 import edu.eci.dosw.tdd.core.model.User;
-import edu.eci.dosw.tdd.persistence.repository.UserRepository;
-import edu.eci.dosw.tdd.persistence.entity.UserEntity;
+import edu.eci.dosw.tdd.core.repository.UserRepository;
 import edu.eci.dosw.tdd.core.model.Role;
 import java.util.Optional;
 import java.util.List;
@@ -40,7 +39,7 @@ class UserServiceTest {
         String username = "ana";
         String passwordHash = "hash";
         when(userRepository.findByUsername(username)).thenReturn(Optional.empty());
-        when(userRepository.save(any(UserEntity.class))).thenAnswer(invocation -> invocation.getArgument(0));
+        when(userRepository.save(any(User.class))).thenAnswer(invocation -> invocation.getArgument(0));
 
         User created = userService.registerUser(name, username, passwordHash);
 
@@ -52,9 +51,9 @@ class UserServiceTest {
 
     @Test
     void getUsersShouldReturnAllRegisteredUsers() {
-        UserEntity entity1 = new UserEntity("id1", "Ana", "ana", "hash1", Role.USER);
-        UserEntity entity2 = new UserEntity("id2", "Luis", "luis", "hash2", Role.USER);
-        when(userRepository.findAll()).thenReturn(List.of(entity1, entity2));
+        User user1 = new User("id1", "Ana", "ana", "hash1", Role.USER);
+        User user2 = new User("id2", "Luis", "luis", "hash2", Role.USER);
+        when(userRepository.findAll()).thenReturn(List.of(user1, user2));
 
         List<User> users = userService.getUsers();
         assertEquals(2, users.size());
@@ -64,8 +63,8 @@ class UserServiceTest {
 
     @Test
     void getUserByIdShouldReturnExistingUser() {
-        UserEntity entity = new UserEntity("id3", "Sofia", "sofia", "hash3", Role.USER);
-        when(userRepository.findById("id3")).thenReturn(Optional.of(entity));
+        User user = new User("id3", "Sofia", "sofia", "hash3", Role.USER);
+        when(userRepository.findById("id3")).thenReturn(Optional.of(user));
 
         User found = userService.getUserById("id3");
         assertEquals("id3", found.getId());
@@ -92,11 +91,11 @@ class UserServiceTest {
         String name = "Ana";
         String username = "ana";
         String passwordHash = "hash";
-        UserEntity entity = new UserEntity("id1", name, username, passwordHash, Role.USER);
+        User user = new User("id1", name, username, passwordHash, Role.USER);
         when(userRepository.findByUsername(username))
             .thenReturn(Optional.empty()) 
-            .thenReturn(Optional.of(entity));
-        when(userRepository.save(any(UserEntity.class))).thenAnswer(invocation -> invocation.getArgument(0));
+            .thenReturn(Optional.of(user));
+        when(userRepository.save(any(User.class))).thenAnswer(invocation -> invocation.getArgument(0));
 
         userService.registerUser(name, username, passwordHash);
         assertThrows(UserNameAlreadyExistsException.class, () -> userService.registerUser(name, username, passwordHash));
@@ -104,8 +103,8 @@ class UserServiceTest {
 
     @Test
     void getUserByUsernameShouldReturnExistingUser() {
-        UserEntity entity = new UserEntity("id4", "Maria", "maria", "hash4", Role.USER);
-        when(userRepository.findByUsername("maria")).thenReturn(Optional.of(entity));
+        User user = new User("id4", "Maria", "maria", "hash4", Role.USER);
+        when(userRepository.findByUsername("maria")).thenReturn(Optional.of(user));
         User found = userService.getUserByUsername("maria");
         assertEquals("id4", found.getId());
         assertEquals("Maria", found.getName());

@@ -28,11 +28,22 @@ public class UserController {
 	private final UserService userService;
 
 	@PostMapping("/register")
-	@PreAuthorize("hasRole('LIBRARIAN')")
 	public ResponseEntity<UserCreatedResponseDTO> registerUser(@Valid @RequestBody UserDTO request) {
-		var user = userService.registerUser(request.getName(), request.getUsername(), request.getPassword(), Role.valueOf(request.getRole()));
+		Role role = resolveRole(request.getRole());
+		var user = userService.registerUser(request.getName(), request.getUsername(), request.getPassword(), role);
 		var response = new UserCreatedResponseDTO(user.getId(), user.getName(), user.getUsername(), user.getRole().name());
 		return new ResponseEntity<>(response, HttpStatus.CREATED);
+	}
+
+	private Role resolveRole(String role) {
+		if (role == null || role.isBlank()) {
+			return Role.USER;
+		}
+		try {
+			return Role.valueOf(role.trim().toUpperCase());
+		} catch (IllegalArgumentException exception) {
+			return Role.USER;
+		}
 	}
 
 	@GetMapping("/all")

@@ -19,15 +19,13 @@ import edu.eci.dosw.tdd.core.model.Book;
 import edu.eci.dosw.tdd.core.model.Loan;
 import edu.eci.dosw.tdd.core.model.StatusLoanEnum;
 import edu.eci.dosw.tdd.core.model.User;
-import edu.eci.dosw.tdd.persistence.mapper.LoanEntityMapper;
-import edu.eci.dosw.tdd.persistence.entity.LoanEntity;
+import edu.eci.dosw.tdd.core.repository.LoanRepository;
+
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
-
-import edu.eci.dosw.tdd.persistence.repository.LoanRepository;
 
 
 @ExtendWith(MockitoExtension.class)
@@ -68,7 +66,7 @@ class LoanServiceTest {
         when(userService.getUserByUsername(userName)).thenReturn(user);
         when(bookService.getBook(bookTitle)).thenReturn(book);
 
-        when(loanRepository.save(any(LoanEntity.class))).thenAnswer(inv -> inv.getArgument(0));
+        when(loanRepository.save(any(Loan.class))).thenAnswer(inv -> inv.getArgument(0));
 
         Loan created = loanService.loanBook(userName, bookTitle, returnDate);
 
@@ -78,7 +76,7 @@ class LoanServiceTest {
         assertEquals(StatusLoanEnum.ACTIVE, created.getStatus());
         assertEquals(returnDate, created.getReturnDate());
 
-        when(loanRepository.findAll()).thenReturn(List.of(LoanEntityMapper.toEntity(created)));
+        when(loanRepository.findAll()).thenReturn(List.of(created));
         assertEquals(1, loanService.getAllLoans().size());
 
         verify(userService).getUserByUsername(userName);
@@ -96,12 +94,10 @@ class LoanServiceTest {
         when(userService.getUserByUsername(userName)).thenReturn(user);
         when(bookService.getBook(bookTitle)).thenReturn(book);
 
-        when(loanRepository.save(any(LoanEntity.class))).thenAnswer(inv -> inv.getArgument(0));
+        when(loanRepository.save(any(Loan.class))).thenAnswer(inv -> inv.getArgument(0));
         Loan loan1 = loanService.loanBook(userName, bookTitle, THREE_DAYS_LATER);
         Loan loan2 = loanService.loanBook(userName, bookTitle, FIVE_DAYS_LATER);
-        when(loanRepository.findAll()).thenReturn(List.of(
-            LoanEntityMapper.toEntity(loan1),
-            LoanEntityMapper.toEntity(loan2)));
+        when(loanRepository.findAll()).thenReturn(List.of(loan1, loan2));
         List<Loan> allLoans = loanService.getAllLoans();
         assertEquals(2, allLoans.size());
     }
@@ -115,21 +111,13 @@ class LoanServiceTest {
         
         when(userService.getUserByUsername(userName)).thenReturn(user);
         when(bookService.getBook(bookTitle)).thenReturn(book);
-        // Simula que ya existen 3 préstamos activos para el usuario
         Loan l1 = new Loan("l1", user, book, TWO_DAYS_LATER);
         l1.setStatus(StatusLoanEnum.ACTIVE);
         Loan l2 = new Loan("l2", user, book, THREE_DAYS_LATER);
         l2.setStatus(StatusLoanEnum.ACTIVE);
         Loan l3 = new Loan("l3", user, book, FOUR_DAYS_LATER);
         l3.setStatus(StatusLoanEnum.ACTIVE);
-        // Simula que el usuario tiene 3 préstamos activos (LoanService cuenta los activos usando findLoansByUsername().stream())
-        LoanEntity e1 = LoanEntityMapper.toEntity(l1);
-        LoanEntity e2 = LoanEntityMapper.toEntity(l2);
-        LoanEntity e3 = LoanEntityMapper.toEntity(l3);
-        e1.setStatus(StatusLoanEnum.ACTIVE);
-        e2.setStatus(StatusLoanEnum.ACTIVE);
-        e3.setStatus(StatusLoanEnum.ACTIVE);
-        when(loanRepository.findByUser_Username(userName)).thenReturn(List.of(e1, e2, e3));
+        when(loanRepository.findByUsername(userName)).thenReturn(List.of(l1, l2, l3));
         assertThrows(LoanLimitExceededException.class,
             () -> loanService.loanBook(userName, bookTitle, FIVE_DAYS_LATER));
     }
@@ -146,10 +134,10 @@ class LoanServiceTest {
         when(userService.getUserByUsername(userName1)).thenReturn(user1);
         when(userService.getUserByUsername(userName2)).thenReturn(user2);
         when(bookService.getBook(bookTitle)).thenReturn(book);
-        when(loanRepository.save(any(LoanEntity.class))).thenAnswer(inv -> inv.getArgument(0));
+        when(loanRepository.save(any(Loan.class))).thenAnswer(inv -> inv.getArgument(0));
         Loan l1 = loanService.loanBook(userName1, bookTitle, WEEK_LATER);
-        Loan l2 = loanService.loanBook(userName2, bookTitle, EIGHT_DAYS_LATER);
-        when(loanRepository.findByUser_Username(userName1)).thenReturn(List.of(LoanEntityMapper.toEntity(l1)));
+        loanService.loanBook(userName2, bookTitle, EIGHT_DAYS_LATER);
+        when(loanRepository.findByUsername(userName1)).thenReturn(List.of(l1));
         List<Loan> loansAna = loanService.getLoansByUsername(userName1);
         assertEquals(1, loansAna.size());
         assertEquals(userName1, loansAna.get(0).getUser().getUsername());
@@ -166,13 +154,10 @@ class LoanServiceTest {
         
         when(userService.getUserByUsername(userName)).thenReturn(user);
         when(bookService.getBook(bookTitle)).thenReturn(book);
-        when(loanRepository.save(any(LoanEntity.class))).thenAnswer(inv -> inv.getArgument(0));
+        when(loanRepository.save(any(Loan.class))).thenAnswer(inv -> inv.getArgument(0));
         Loan createdLoan = loanService.loanBook(userName, bookTitle, returnDate);
 
-        LoanEntity entity = LoanEntityMapper.toEntity(createdLoan);
-        entity.setStatus(StatusLoanEnum.RETURNED);
-        createdLoan.setStatus(StatusLoanEnum.RETURNED);
-        when(loanRepository.findByUser_UsernameAndBook_Title(userName, bookTitle)).thenReturn(Optional.of(entity));
+        when(loanRepository.findByUsernameAndBookTitle(userName, bookTitle)).thenReturn(Optional.of(createdLoan));
         loanService.returnBook(userName, bookTitle);
         assertEquals(StatusLoanEnum.RETURNED, createdLoan.getStatus());
         verify(bookService).increaseAvailableCopies(bookTitle, 1);
@@ -187,7 +172,7 @@ class LoanServiceTest {
         
         when(userService.getUserByUsername(userName)).thenReturn(user);
         when(bookService.getBook(bookTitle)).thenReturn(book);
-        when(loanRepository.findByUser_UsernameAndBook_Title(userName, bookTitle)).thenReturn(Optional.empty());
+        when(loanRepository.findByUsernameAndBookTitle(userName, bookTitle)).thenReturn(Optional.empty());
         assertThrows(LoanNotFoundException.class,
                 () -> loanService.returnBook(userName, bookTitle));
     }
@@ -201,9 +186,9 @@ class LoanServiceTest {
         
         when(userService.getUserByUsername(userName)).thenReturn(user);
         when(bookService.getBook(bookTitle)).thenReturn(book);
-        when(loanRepository.save(any(LoanEntity.class))).thenAnswer(inv -> inv.getArgument(0));
+        when(loanRepository.save(any(Loan.class))).thenAnswer(inv -> inv.getArgument(0));
         Loan l = loanService.loanBook(userName, bookTitle, WEEK_LATER);
-        when(loanRepository.findByUser_Username(userName)).thenReturn(List.of(LoanEntityMapper.toEntity(l)));
+        when(loanRepository.findByUsername(userName)).thenReturn(List.of(l));
         boolean hasActive = loanService.userHasActiveLoan(userName);
         assertTrue(hasActive);
     }
@@ -211,9 +196,8 @@ class LoanServiceTest {
     @Test
     void userHasActiveLoanShouldReturnFalseWhenUserHasNoActiveLoans() {
         String userName = "NoLoans";
-        User user = new User("u-1", "no loans", userName, "hash");
-        
-        when(loanRepository.findByUser_Username(userName)).thenReturn(List.of());
+
+        when(loanRepository.findByUsername(userName)).thenReturn(List.of());
         boolean hasActive = loanService.userHasActiveLoan(userName);
         assertFalse(hasActive);
     }
@@ -230,13 +214,11 @@ class LoanServiceTest {
         when(userService.getUserByUsername(userName1)).thenReturn(user1);
         when(userService.getUserByUsername(userName2)).thenReturn(user2);
         when(bookService.getBook(bookTitle)).thenReturn(book);
-        when(loanRepository.save(any(LoanEntity.class))).thenAnswer(inv -> inv.getArgument(0));
+        when(loanRepository.save(any(Loan.class))).thenAnswer(inv -> inv.getArgument(0));
         Loan l1 = loanService.loanBook(userName1, bookTitle, WEEK_LATER);
         Loan l2 = loanService.loanBook(userName2, bookTitle, EIGHT_DAYS_LATER);
         l2.setStatus(StatusLoanEnum.RETURNED);
-        when(loanRepository.findAll()).thenReturn(List.of(
-            LoanEntityMapper.toEntity(l1),
-            LoanEntityMapper.toEntity(l2)));
+        when(loanRepository.findAll()).thenReturn(List.of(l1, l2));
         List<Loan> activeLoans = loanService.getActiveLoans();
         assertEquals(1, activeLoans.size());
         assertEquals(StatusLoanEnum.ACTIVE, activeLoans.get(0).getStatus());
@@ -251,10 +233,10 @@ class LoanServiceTest {
         
         when(userService.getUserByUsername(userName)).thenReturn(user);
         when(bookService.getBook(bookTitle)).thenReturn(book);
-        when(loanRepository.save(any(LoanEntity.class))).thenAnswer(inv -> inv.getArgument(0));
+        when(loanRepository.save(any(Loan.class))).thenAnswer(inv -> inv.getArgument(0));
         Loan loan = loanService.loanBook(userName, bookTitle, WEEK_LATER);
         loan.setStatus(StatusLoanEnum.RETURNED);
-        when(loanRepository.findAll()).thenReturn(List.of(LoanEntityMapper.toEntity(loan)));
+        when(loanRepository.findAll()).thenReturn(List.of(loan));
         List<Loan> returnedLoans = loanService.getReturnedLoans();
         assertEquals(1, returnedLoans.size());
         assertEquals(StatusLoanEnum.RETURNED, returnedLoans.get(0).getStatus());
@@ -269,16 +251,12 @@ class LoanServiceTest {
         
         when(userService.getUserByUsername(userName)).thenReturn(user);
         when(bookService.getBook(bookTitle)).thenReturn(book);
-        when(loanRepository.save(any(LoanEntity.class))).thenAnswer(inv -> inv.getArgument(0));
+        when(loanRepository.save(any(Loan.class))).thenAnswer(inv -> inv.getArgument(0));
         Loan loan = loanService.loanBook(userName, bookTitle, WEEK_LATER);
         loan.setStatus(StatusLoanEnum.RETURNED);
         Loan loan2 = loanService.loanBook(userName, bookTitle, FIVE_DAYS_LATER);
-        when(loanRepository.findAll()).thenReturn(List.of(
-            LoanEntityMapper.toEntity(loan),
-            LoanEntityMapper.toEntity(loan2)));
-        List<Loan> activeLoans = loanService.getActiveLoans().stream()
-            .filter(l -> l.getUser().getUsername().equals(userName))
-            .toList();
+        when(loanRepository.findByUsername(userName)).thenReturn(List.of(loan, loan2));
+        List<Loan> activeLoans = loanService.getActiveLoansByUserName(userName);
         assertEquals(1, activeLoans.size());
         assertEquals(StatusLoanEnum.ACTIVE, activeLoans.get(0).getStatus());
         assertEquals(userName, activeLoans.get(0).getUser().getUsername());
