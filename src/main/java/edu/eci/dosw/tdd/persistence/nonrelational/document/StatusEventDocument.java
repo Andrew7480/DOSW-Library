@@ -1,9 +1,11 @@
 package edu.eci.dosw.tdd.persistence.nonrelational.document;
 
+import java.time.LocalDate;
+
 import lombok.Data;
 
 @Data
-public class StatusHistory {
+public class StatusEventDocument {
     private String status;
-    private String date;
+    private LocalDate date;
 }

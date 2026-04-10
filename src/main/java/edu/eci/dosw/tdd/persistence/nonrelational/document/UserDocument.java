@@ -6,6 +6,7 @@ import org.springframework.data.mongodb.core.mapping.Document;
 import edu.eci.dosw.tdd.core.model.Role;
 import lombok.Data;
 
+import java.time.LocalDate;
 import java.util.List;
 
 @Document(collection = "users")
@@ -19,8 +20,8 @@ public class UserDocument {
     private String passwordHash;
     private Role role;
     private Membership membership;
-    private String createdAt;
-    private List<Loans> loans;
+    private LocalDate createdAt;
+    private List<LoanDocument> loans;
     
 
 }

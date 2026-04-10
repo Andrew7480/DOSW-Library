@@ -1,4 +1,4 @@
-package edu.eci.dosw.tdd.core.service;
+package edu.eci.dosw.tdd.core.repository;
 
 import java.util.List;
 import java.util.Optional;
@@ -10,4 +10,8 @@ public interface LoanRepository {
     Optional<Loan> findById(String id);
     List<Loan> findAll();
     void delete(String id);
+
+    List<Loan> findByUsername(String username);
+
+    Optional<Loan> findByUsernameAndBookTitle(String username, String bookTitle);
 }

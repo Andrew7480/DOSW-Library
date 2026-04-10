@@ -20,9 +20,7 @@ public class BookDocument {
     private String author;
     private String catalogDate;
     private Metadata metadata;
-    private String language;
-    private String publisher;
-    private Availability availability;
+    private AvailabilityDocument availability;
 
     
 }
