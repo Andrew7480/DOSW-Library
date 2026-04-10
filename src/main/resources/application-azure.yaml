@@ -1,0 +1,18 @@
+spring:
+  config:
+    activate:
+      on-profile: azure
+  autoconfigure:
+    exclude:
+      - org.springframework.boot.jdbc.autoconfigure.DataSourceAutoConfiguration
+      - org.springframework.boot.jdbc.autoconfigure.DataSourceInitializationAutoConfiguration
+      - org.springframework.boot.hibernate.autoconfigure.HibernateJpaAutoConfiguration
+      - org.springframework.boot.data.jpa.autoconfigure.JpaRepositoriesAutoConfiguration
+  mongodb:
+    uri: ${SPRING_DATA_MONGODB_URI:${SPRING_MONGODB_URI}}
+    database: ${SPRING_DATA_MONGODB_DATABASE:${SPRING_MONGODB_DATABASE:dosw_library}}
+
+server:
+  port: ${SERVER_PORT:80}
+  ssl:
+    enabled: false
