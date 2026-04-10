@@ -62,3 +62,14 @@ SELECT * FROM books LIMIT 10;
 
 docker stop dosw-postgres
 docker rm dosw-postgres
+
+
+
+
+
+docker:
+ 
+docker run -d --name sonarName -p 9000:9000 sonarqube  
+ 
+mvn clean verify sonar:sonar -Dsonar.projectKey=bitacora -Dsonar.host.url=http://localhost:9000 -Dsonar.login=TOKEN
+ 
